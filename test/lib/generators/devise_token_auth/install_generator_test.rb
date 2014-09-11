@@ -14,65 +14,18 @@ module DeviseTokenAuth
         run_generator
       end
 
-      test 'user model is created, concern is included' do
-        assert_file 'app/models/user.rb' do |model|
-          assert_match(/include DeviseTokenAuth::Concerns::User/, model)
-        end
-      end
-
       test 'initializer is created' do
         assert_file 'config/initializers/devise_token_auth.rb'
       end
 
       test 'migration is created' do
-        assert_migration 'db/migrate/devise_token_auth_create_users.rb'
+        assert_migration 'db/migrate/devise_token_auth_add_token_info_to_users.rb'
       end
 
       test 'subsequent runs raise no errors' do
         run_generator
       end
     end
-
-    describe 'existing user model' do
-      setup :prepare_destination
-
-      before do
-        @dir = File.join(destination_root, "app", "models")
-
-        @fname = File.join(@dir, "user.rb")
-
-        # make dir if not exists
-        FileUtils.mkdir_p(@dir)
-
-        @f = File.open(@fname, 'w') {|f|
-          f.write <<-RUBY
-class User < ActiveRecord::Base
-
-  def whatever
-    puts 'whatever'
-  end
-end
-          RUBY
-        }
-
-        run_generator
-      end
-
-      test 'user concern is injected into existing model' do
-        assert_file 'app/models/user.rb' do |model|
-          assert_match(/include DeviseTokenAuth::Concerns::User/, model)
-        end
-      end
-
-      test 'subsequent runs do not modify file' do
-        run_generator
-        assert_file 'app/models/user.rb' do |model|
-          matches = model.scan(/include DeviseTokenAuth::Concerns::User/m).size
-          assert_equal 1, matches
-        end
-      end
-    end
-
 
     describe 'routes' do
       setup :prepare_destination
@@ -116,7 +69,7 @@ end
         end
 
         test 'migration is created' do
-          assert_migration 'db/migrate/devise_token_auth_create_mangs.rb'
+          assert_migration 'db/migrate/devise_token_auth_add_token_info_to_mangs.rb'
         end
 
         test 'route method is appended to routes file' do
