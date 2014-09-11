@@ -25,7 +25,7 @@ module DeviseTokenAuth::Concerns::SetUserByToken
     @user = @current_user = uid && resource_class.find_by_uid(uid)
 
     if @user && @user.valid_token?(@token, @client_id)
-      sign_in(:user, @user, store: false, bypass: true)
+      sign_in(mapping.name, @user, store: false)
 
       # check this now so that the duration of the request itself doesn't eat
       # away the buffer
@@ -59,8 +59,11 @@ module DeviseTokenAuth::Concerns::SetUserByToken
     end
   end
 
+  def mapping
+    @mapping ||= request.env['devise.mapping'] || Devise.mappings.values.first
+  end
+
   def resource_class
-    mapping = request.env['devise.mapping'] || Devise.mappings.values.first
     mapping.to
   end
 

@@ -1,47 +1,20 @@
 # see http://www.emilsoman.com/blog/2013/05/18/building-a-tested/
 module DeviseTokenAuth
   class SessionsController < Devise::SessionsController
-    prepend_before_filter :require_no_authentication, :only => [:create, :destroy]
     skip_before_filter :verify_signed_out_user, only: :destroy
 
     include Devise::Controllers::Helpers
     include DeviseTokenAuth::Concerns::SetUserByToken
 
     def create
-      @user = resource_class.find_by_email(resource_params[:email])
-
-      if @user and valid_params? and @user.valid_password?(resource_params[:password]) and @user.confirmed?
-        # create client id
-        @client_id = SecureRandom.urlsafe_base64(nil, false)
-        @token     = SecureRandom.urlsafe_base64(nil, false)
-
-        @user.tokens[@client_id] = {
-          token: BCrypt::Password.create(@token),
-          expiry: (Time.now + DeviseTokenAuth.token_lifespan).to_i
-        }
-        @user.save
-
-        render json: {
-          data: @user.as_json(except: [
+      self.resource = warden.authenticate!(auth_options)
+      sign_in(resource_name, resource, :store => false)
+      yield resource if block_given?
+      render json: {
+        data: resource.as_json(except: [
             :tokens, :confirm_success_url, :reset_password_redirect_url, :created_at, :updated_at
-          ])
-        }
-
-      elsif @user and not @user.confirmed?
-        render json: {
-          success: false,
-          errors: [
-            "A confirmation email was sent to your account at #{@user.email}. "+
-            "You must follow the instructions in the email before your account "+
-            "can be activated"
-          ]
-        }, status: 401
-
-      else
-        render json: {
-          errors: ["Invalid login credentials. Please try again."]
-        }, status: 401
-      end
+        ])
+      }
     end
 
     def destroy

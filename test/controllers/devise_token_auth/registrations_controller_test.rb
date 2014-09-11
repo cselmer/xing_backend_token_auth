@@ -260,34 +260,6 @@ class DeviseTokenAuth::RegistrationsControllerTest < ActionController::TestCase
       end
     end
 
-    describe "Ouath user has existing email" do
-      before do
-        @existing_user = users(:duplicate_email_facebook_user)
-
-        xhr :post, :create, {
-          email: @existing_user.email,
-          password: "secret123",
-          password_confirmation: "secret123",
-          confirm_success_url: Faker::Internet.url
-        }
-
-        @user = assigns(:resource)
-        @data = JSON.parse(response.body)
-      end
-
-      test "request should be successful" do
-        assert_equal 200, response.status
-      end
-
-      test "user should have been created" do
-        assert @user.id
-      end
-
-      test "new user data should be returned as json" do
-        assert @data['data']['email']
-      end
-    end
-
     describe "Alternate user class" do
       setup do
         @request.env['devise.mapping'] = Devise.mappings[:mang]
@@ -319,6 +291,7 @@ class DeviseTokenAuth::RegistrationsControllerTest < ActionController::TestCase
       end
 
       test "Mang should be destroyed" do
+        @user.confirm!
         @auth_headers  = @user.create_new_auth_token
         @client_id     = @auth_headers['client']
 

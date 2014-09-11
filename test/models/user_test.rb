@@ -36,17 +36,5 @@ class UserTest < ActiveSupport::TestCase
         assert @user.errors.messages[:confirm_success_url]
       end
     end
-
-    describe 'oauth2 authentication' do
-      test 'model should save even if email is blank' do
-        @user.provider              = 'facebook'
-        @user.password              = @password
-        @user.password_confirmation = @password
-        @user.confirm_success_url   = @success_url
-
-        assert @user.save
-        refute @user.errors.messages[:email]
-      end
-    end
   end
 end

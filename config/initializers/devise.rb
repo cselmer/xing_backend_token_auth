@@ -200,4 +200,8 @@ Devise.setup do |config|
       ::OmniAuth::config.path_prefix = config.omniauth_path_prefix = DeviseTokenAuth.omniauth_prefix
     end
   end
+
+  config.warden do |manager|
+    manager.failure_app = TokenAuthFailureApp
+  end
 end

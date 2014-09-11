@@ -16,24 +16,9 @@ module DeviseTokenAuth
         say_status("skipped", "Migration 'devise_token_auth_create_#{ user_class.underscore }' already exists")
       else
         migration_template(
-          "devise_token_auth_create_users.rb.erb",
-          "db/migrate/devise_token_auth_create_#{ user_class.pluralize.underscore }.rb"
+          "devise_token_auth_add_token_info_to_users.rb.erb",
+          "db/migrate/devise_token_auth_add_token_info_to_#{ user_class.pluralize.underscore }.rb"
         )
-      end
-    end
-
-    def create_user_model
-      fname = "app/models/#{ user_class.underscore }.rb"
-      unless File.exist?(File.join(destination_root, fname))
-        template("user.rb", fname)
-      else
-        inclusion = "include DeviseTokenAuth::Concerns::User"
-        unless parse_file_for_line(fname, inclusion)
-          inject_into_file fname, after: "class #{user_class} < ActiveRecord::Base\n" do <<-'RUBY'
-  include DeviseTokenAuth::Concerns::User
-          RUBY
-          end
-        end
       end
     end
 

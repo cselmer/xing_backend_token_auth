@@ -24,8 +24,7 @@ module DeviseTokenAuth
       end
 
       @user = resource_class.where({
-        email: resource_params[:email],
-        provider: 'email'
+        email: resource_params[:email]
       }).first
 
       errors = nil
@@ -36,8 +35,7 @@ module DeviseTokenAuth
         })
 
         @user = resource_class.send_reset_password_instructions({
-          email: resource_params[:email],
-          provider: 'email'
+          email: resource_params[:email]
         })
 
         if @user.errors.empty?
@@ -98,15 +96,6 @@ module DeviseTokenAuth
           success: false,
           errors: ['Unauthorized']
         }, status: 401
-      end
-
-      # make sure account doesn't use oauth2 provider
-      unless @user.provider == 'email'
-        return render json: {
-          success: false,
-          errors: ["This account does not require a password. Sign in using "+
-                   "your #{@user.provider.humanize} account instead."]
-        }, status: 422
       end
 
       # ensure that password params were sent

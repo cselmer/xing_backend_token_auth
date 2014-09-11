@@ -15,7 +15,6 @@ module DeviseTokenAuth
     def create
       @resource            = resource_class.new(sign_up_params)
       @resource.uid        = sign_up_params[:email]
-      @resource.provider   = "email"
 
       begin
         if @resource.save

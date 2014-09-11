@@ -7,6 +7,7 @@ require 'test_helper'
 #  was the appropriate message delivered in the json payload?
 
 class DeviseTokenAuth::SessionsControllerTest < ActionController::TestCase
+
   describe DeviseTokenAuth::SessionsController do
     describe "Confirmed user" do
       before do
@@ -18,8 +19,10 @@ class DeviseTokenAuth::SessionsControllerTest < ActionController::TestCase
       describe 'success' do
         before do
           xhr :post, :create, {
-            email: @existing_user.email,
-            password: 'secret123'
+            user: {
+              email: @existing_user.email,
+              password: 'secret123'
+            }
           }
 
           @user = assigns(:user)
@@ -66,8 +69,10 @@ class DeviseTokenAuth::SessionsControllerTest < ActionController::TestCase
       describe 'failure' do
         before do
           xhr :post, :create, {
-            email: @existing_user.email,
-            password: 'bogus'
+            user: {
+              email: @existing_user.email,
+              password: 'bogus'
+            }
           }
 
           @user = assigns(:user)
@@ -88,8 +93,10 @@ class DeviseTokenAuth::SessionsControllerTest < ActionController::TestCase
       before do
         @unconfirmed_user = users(:unconfirmed_email_user)
         xhr :post, :create, {
+          user: {
           email: @unconfirmed_user.email,
           password: 'secret123'
+          }
         }
         @user = assigns(:user)
         @data = JSON.parse(response.body)
@@ -107,8 +114,10 @@ class DeviseTokenAuth::SessionsControllerTest < ActionController::TestCase
     describe "Non-existing user" do
       before do
         xhr :post, :create, {
+          user: {
           email: -> { Faker::Internet.email },
-          password: -> { Faker::Number.number(10) }
+          password: -> { Faker::Number.number(10) },
+          }
         }
         @user = assigns(:user)
         @data = JSON.parse(response.body)
@@ -138,8 +147,10 @@ class DeviseTokenAuth::SessionsControllerTest < ActionController::TestCase
         @existing_user.save!
 
         xhr :post, :create, {
-          email: @existing_user.email,
-          password: 'secret123'
+          mang: {
+            email: @existing_user.email,
+            password: 'secret123'
+          }
         }
 
         @user = assigns(:user)
