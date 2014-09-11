@@ -38,12 +38,5 @@ module DeviseTokenAuth
       end
     end
 
-    def valid_params?
-      resource_params[:password] && resource_params[:email]
-    end
-
-    def resource_params
-      params.permit(devise_parameter_sanitizer.for(:sign_in))
-    end
   end
 end

@@ -35,8 +35,8 @@ module DeviseTokenAuth
         clean_up_passwords resource
         render json: {
           status: 'error',
-          data:   @resource,
-          errors: ["An account already exists for #{@resource.email}"]
+          data:   resource,
+          errors: ["An account already exists for #{resource.send(resource_class.authentication_keys.first)}"]
         }, status: 403
       end
     end
