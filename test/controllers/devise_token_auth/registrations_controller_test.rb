@@ -11,14 +11,16 @@ class DeviseTokenAuth::RegistrationsControllerTest < ActionController::TestCase
     describe "Successful registration" do
       before do
         xhr :post, :create, {
-          email: Faker::Internet.email,
-          password: "secret123",
-          password_confirmation: "secret123",
-          confirm_success_url: Faker::Internet.url,
-          unpermitted_param: '(x_x)'
+          user: {
+            email: Faker::Internet.email,
+            password: "secret123",
+            password_confirmation: "secret123",
+            confirm_success_url: Faker::Internet.url,
+            unpermitted_param: '(x_x)'
+          }
         }
 
-        @user = assigns(:resource)
+        @user = assigns(:user)
         @data = JSON.parse(response.body)
         @mail = ActionMailer::Base.deliveries.last
       end
@@ -55,14 +57,16 @@ class DeviseTokenAuth::RegistrationsControllerTest < ActionController::TestCase
     describe "Adding extra params" do
       before do
         xhr :post, :create, {
-          email: Faker::Internet.email,
-          password: "secret123",
-          password_confirmation: "secret123",
-          confirm_success_url: Faker::Internet.url,
-          operating_thetan: 2
+          user: {
+            email: Faker::Internet.email,
+            password: "secret123",
+            password_confirmation: "secret123",
+            confirm_success_url: Faker::Internet.url,
+            operating_thetan: 2
+          }
         }
 
-        @user = assigns(:resource)
+        @user = assigns(:user)
         @data = JSON.parse(response.body)
         @mail = ActionMailer::Base.deliveries.last
       end
@@ -75,13 +79,15 @@ class DeviseTokenAuth::RegistrationsControllerTest < ActionController::TestCase
     describe "Mismatched passwords" do
       before do
         xhr :post, :create, {
-          email: Faker::Internet.email,
-          password: "secret123",
-          password_confirmation: "bogus",
-          confirm_success_url: Faker::Internet.url
+          user: {
+            email: Faker::Internet.email,
+            password: "secret123",
+            password_confirmation: "bogus",
+            confirm_success_url: Faker::Internet.url
+          }
         }
 
-        @user = assigns(:resource)
+        @user = assigns(:user)
         @data = JSON.parse(response.body)
       end
 
@@ -103,13 +109,15 @@ class DeviseTokenAuth::RegistrationsControllerTest < ActionController::TestCase
         @existing_user = users(:confirmed_email_user)
 
         xhr :post, :create, {
-          email: @existing_user.email,
-          password: "secret123",
-          password_confirmation: "secret123",
-          confirm_success_url: Faker::Internet.url
+          user: {
+            email: @existing_user.email,
+            password: "secret123",
+            password_confirmation: "secret123",
+            confirm_success_url: Faker::Internet.url
+          }
         }
 
-        @user = assigns(:resource)
+        @user = assigns(:user)
         @data = JSON.parse(response.body)
       end
 
@@ -189,7 +197,9 @@ class DeviseTokenAuth::RegistrationsControllerTest < ActionController::TestCase
             @new_operating_thetan = 1000000
 
             xhr :put, :update, {
-              operating_thetan: @new_operating_thetan
+              user: {
+               operating_thetan: @new_operating_thetan
+              }
             }
 
             @data = JSON.parse(response.body)
@@ -210,7 +220,9 @@ class DeviseTokenAuth::RegistrationsControllerTest < ActionController::TestCase
             # test invalid update param
             @new_operating_thetan = "blegh"
             xhr :put, :update, {
-              operating_thetan: @new_operating_thetan
+              user: {
+                operating_thetan: @new_operating_thetan
+              }
             }
 
             @data = JSON.parse(response.body)
@@ -243,7 +255,9 @@ class DeviseTokenAuth::RegistrationsControllerTest < ActionController::TestCase
           @new_operating_thetan = 3
 
           xhr :put, :update, {
-            operating_thetan: @new_operating_thetan
+            user: {
+              operating_thetan: @new_operating_thetan
+            }
           }
 
           @data = JSON.parse(response.body)
@@ -271,13 +285,15 @@ class DeviseTokenAuth::RegistrationsControllerTest < ActionController::TestCase
 
       before do
         xhr :post, :create, {
-          email: Faker::Internet.email,
-          password: "secret123",
-          password_confirmation: "secret123",
-          confirm_success_url: Faker::Internet.url
+          mang: {
+            email: Faker::Internet.email,
+            password: "secret123",
+            password_confirmation: "secret123",
+            confirm_success_url: Faker::Internet.url
+          }
         }
 
-        @user = assigns(:resource)
+        @user = assigns(:mang)
         @data = JSON.parse(response.body)
         @mail = ActionMailer::Base.deliveries.last
       end

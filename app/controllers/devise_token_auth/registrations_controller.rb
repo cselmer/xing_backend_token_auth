@@ -13,25 +13,26 @@ module DeviseTokenAuth
     respond_to :json
 
     def create
-      @resource            = resource_class.new(sign_up_params)
-      @resource.uid        = sign_up_params[:email]
+      build_resource(sign_up_params)
+
+      resource.uid        = sign_up_params[resource_class.authentication_keys.first]
 
       begin
-        if @resource.save
+        if resource.save
           render json: {
             status: 'success',
-            data:   @resource.as_json
+            data:   resource.as_json
           }
         else
-          clean_up_passwords @resource
+          clean_up_passwords resource
           render json: {
             status: 'error',
-            data:   @resource,
-            errors: @resource.errors
+            data:   resource,
+            errors: resource.errors
           }, status: 403
         end
       rescue ActiveRecord::RecordNotUnique
-        clean_up_passwords @resource
+        clean_up_passwords resource
         render json: {
           status: 'error',
           data:   @resource,
@@ -78,11 +79,11 @@ module DeviseTokenAuth
     end
 
     def sign_up_params
-      params.permit(devise_parameter_sanitizer.for(:sign_up))
+      devise_parameter_sanitizer.sanitize(:sign_up)
     end
 
     def account_update_params
-      params.permit(devise_parameter_sanitizer.for(:account_update))
+      devise_parameter_sanitizer.sanitize(:account_update)
     end
 
     def configure_devise_token_auth_permitted_parameters
