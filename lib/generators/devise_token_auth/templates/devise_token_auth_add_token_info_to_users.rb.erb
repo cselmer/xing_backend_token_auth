@@ -1,0 +1,14 @@
+class DeviseTokenAuthAddTokenInfoTo<%= user_class.pluralize %> < ActiveRecord::Migration
+  def change
+    change_table(:<%= user_class.pluralize.underscore %>) do |t|
+      ## unique oauth id
+      t.string :provider
+      t.string :uid, :null => false, :default => ""
+
+      ## Tokens
+      t.text :tokens
+    end
+
+    add_index :<%= user_class.pluralize.underscore %>, :uid,                  :unique => true
+  end
+end
