@@ -22,17 +22,19 @@ module DeviseTokenAuth::Concerns::SetUserByToken
     @client_id ||= 'default'
 
     # mitigate timing attacks by finding by uid instead of auth token
-    @user = @current_user = uid && resource_class.find_by_uid(uid)
+    @user = uid && resource_class.find_by_uid(uid)
+    instance_variable_set(:"@current_#{resource_name}", @user)
 
     if @user && @user.valid_token?(@token, @client_id)
-      sign_in(mapping.name, @user, store: false)
+      sign_in(resource_name, @user, store: false)
 
       # check this now so that the duration of the request itself doesn't eat
       # away the buffer
       @is_batch_request = is_batch_request?(@user, @client_id)
     else
       # zero all values previously set values
-      @user = @current_user = @is_batch_request = nil
+      @user = @is_batch_request = nil
+      instance_variable_set(:"@current_#{resource_name}", @user)
     end
   end
 
@@ -65,6 +67,10 @@ module DeviseTokenAuth::Concerns::SetUserByToken
 
   def resource_class
     mapping.to
+  end
+
+  def resource_name
+    mapping.name
   end
 
   private
