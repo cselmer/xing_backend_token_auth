@@ -7,7 +7,7 @@ module Devise
 
         serialize :tokens, JSON
 
-        validates_presence_of :confirm_success_url, if: Proc.new {|u| !u.confirmed?}
+        validates_presence_of :confirm_success_url, if: Proc.new {|u| defined?(u.confirmed?) && !u.confirmed?}
 
         # can't set default on text fields in mysql, simulate here instead.
         after_save :set_empty_token_hash
