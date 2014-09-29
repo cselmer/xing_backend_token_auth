@@ -1,10 +1,9 @@
 # see http://www.emilsoman.com/blog/2013/05/18/building-a-tested/
 module DeviseTokenAuth
-  class SessionsController < Devise::SessionsController
-    skip_before_filter :verify_signed_out_user, only: :destroy
-
-    include Devise::Controllers::Helpers
-    include DeviseTokenAuth::Concerns::SetUserByToken
+  class SessionsController < DeviseTokenAuth::ApplicationController
+    before_filter :set_user_by_token, :only => [:destroy]
+    prepend_before_filter :allow_params_authentication!, only: :create
+    prepend_before_filter only: [ :create, :destroy ] { request.env["devise.skip_timeout"] = true }
 
     def create
       self.resource = warden.authenticate!(auth_options)
@@ -24,6 +23,10 @@ module DeviseTokenAuth
             :tokens, :confirm_success_url, :reset_password_redirect_url, :created_at, :updated_at
         ])
       }
+    end
+
+    def auth_options
+      { scope: resource_name, recall: "#{controller_path}#new" }
     end
 
     def destroy

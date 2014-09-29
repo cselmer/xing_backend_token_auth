@@ -20,20 +20,21 @@ class UserTest < ActiveSupport::TestCase
         @user.provider              = 'email'
         @user.password              = @password
         @user.password_confirmation = @password
-        @user.confirm_success_url   = @success_url
 
         refute @user.save
         assert @user.errors.messages[:email]
       end
+    end
 
-      test 'model should not save if confirm_success_url is not provided' do
-        @user.provider              = 'email'
-        @user.email                 = @email
+    describe 'oauth2 authentication' do
+      test 'model should save even if email is blank' do
+        @user.provider              = 'facebook'
+	@user.email                 = @email
         @user.password              = @password
         @user.password_confirmation = @password
+        @user.confirm_success_url   = @success_url
 
-        refute @user.save
-        assert @user.errors.messages[:confirm_success_url]
+        assert @user.save
       end
     end
   end

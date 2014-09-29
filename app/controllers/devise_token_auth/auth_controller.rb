@@ -1,8 +1,8 @@
 module DeviseTokenAuth
   class AuthController < DeviseTokenAuth::ApplicationController
-    respond_to :json
     skip_after_filter :update_auth_header, :only => [:omniauth_success, :omniauth_failure]
     skip_before_filter :assert_is_devise_resource!, :only => [:validate_token]
+    before_filter :set_user_by_token, :only => [:validate_token]
 
     def validate_token
       # @user will have been set by set_user_token concern
@@ -22,7 +22,6 @@ module DeviseTokenAuth
     end
 
     def omniauth_success
-
       # find or create user by provider and provider uid
       @user = resource_name.where({
         uid:      auth_hash['uid'],
@@ -122,9 +121,17 @@ module DeviseTokenAuth
     end
 
     def generate_url(url, params = {})
-      uri = URI(url)
-      uri.query = params.to_query
-      uri.to_s
+      auth_url = url
+
+      # ensure that hash-bang is present BEFORE querystring for angularjs
+      unless url.match(/#/)
+        auth_url += '#'
+      end
+
+      # add query AFTER hash-bang
+      auth_url += "?#{params.to_query}"
+
+      return auth_url
     end
   end
 end

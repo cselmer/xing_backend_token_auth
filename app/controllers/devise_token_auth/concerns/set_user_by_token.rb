@@ -1,15 +1,22 @@
 module DeviseTokenAuth::Concerns::SetUserByToken
   extend ActiveSupport::Concern
+  include DeviseTokenAuth::Controllers::Helpers
 
   included do
-    before_action :set_user_by_token
     after_action :update_auth_header
   end
 
   # user auth
-  def set_user_by_token
+  def set_user_by_token(mapping=nil)
+    # determine target authentication class
+    self.mapping = mapping
+    rc = resource_class
+
     # no default user defined
-    return false unless resource_class
+    return unless rc
+
+    # user has already been found and authenticated
+    return @user if @user and @user.class == rc
 
     # parse header for values necessary for authentication
     uid        = request.headers['uid']
@@ -22,19 +29,19 @@ module DeviseTokenAuth::Concerns::SetUserByToken
     @client_id ||= 'default'
 
     # mitigate timing attacks by finding by uid instead of auth token
-    @user = uid && resource_class.find_by_uid(uid)
-    instance_variable_set(:"@current_#{resource_name}", @user)
+    user = uid && rc.find_by_uid(uid)
 
-    if @user && @user.valid_token?(@token, @client_id)
-      sign_in(resource_name, @user, store: false)
+    if user && user.valid_token?(@token, @client_id)
+      sign_in(resource_name, user, store: false)
 
       # check this now so that the duration of the request itself doesn't eat
       # away the buffer
-      @is_batch_request = is_batch_request?(@user, @client_id)
+      @is_batch_request = is_batch_request?(user, @client_id)
+
+      return @user = user
     else
       # zero all values previously set values
-      @user = @is_batch_request = nil
-      instance_variable_set(:"@current_#{resource_name}", @user)
+      return @user = @is_batch_request = nil
     end
   end
 
@@ -65,6 +72,10 @@ module DeviseTokenAuth::Concerns::SetUserByToken
     @mapping ||= request.env['devise.mapping'] || Devise.mappings.values.first
   end
 
+  def mapping=(m)
+    @mapping = Devise.mappings[m]
+  end
+
   def resource_class
     mapping.to
   end
@@ -74,6 +85,7 @@ module DeviseTokenAuth::Concerns::SetUserByToken
   end
 
   private
+
 
   def is_batch_request?(user, client_id)
     user.tokens[client_id] and

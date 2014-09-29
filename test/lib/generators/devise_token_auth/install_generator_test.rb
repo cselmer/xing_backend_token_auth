@@ -65,7 +65,7 @@ end
 
       describe 'subsequent models' do
         before do
-          run_generator %w(Mang /bong)
+          run_generator %w(Mang /mangs)
         end
 
         test 'migration is created' do
@@ -74,7 +74,7 @@ end
 
         test 'route method is appended to routes file' do
           assert_file 'config/routes.rb' do |routes|
-            assert_match(/mount_devise_token_auth_for 'Mang', at: '\/bong'/, routes)
+            assert_match(/mount_devise_token_auth_for 'Mang', at: '\/mangs'/, routes)
           end
         end
 

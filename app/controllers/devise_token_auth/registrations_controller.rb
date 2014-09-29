@@ -1,13 +1,7 @@
 module DeviseTokenAuth
-  class RegistrationsController < Devise::RegistrationsController
-    include Devise::Controllers::Helpers
-    include DeviseTokenAuth::Concerns::SetUserByToken
+  class RegistrationsController < DeviseTokenAuth::ApplicationController
 
-    prepend_before_filter :require_no_authentication, :only => [ :create, :destroy, :update ]
-    before_action :configure_devise_token_auth_permitted_parameters
-
-    skip_before_filter :set_user_by_token, :only => [:create]
-    skip_before_filter :authenticate_scope!, :only => [:destroy, :update]
+    before_filter :set_user_by_token, :only => [:destroy, :update]
     skip_after_filter :update_auth_header, :only => [:create, :destroy]
 
     respond_to :json
@@ -17,8 +11,24 @@ module DeviseTokenAuth
 
       resource.uid        = sign_up_params[resource_class.authentication_keys.first]
 
+      # success redirect url is required
+      unless !defined?(resource.confirmed?) or params[:confirm_success_url]
+        return render json: {
+          status: 'error',
+          data:   resource,
+          errors: ["Missing `confirm_success_url` param."]
+        }, status: 403
+      end
+
       begin
         if resource.save
+          if defined?(resource.confirmed?)
+            resource.send_confirmation_instructions({
+              client_config: params[:config_name],
+              redirect_url: params[:confirm_success_url]
+            })
+          end
+
           render json: {
             status: 'success',
             data:   resource.as_json
@@ -78,16 +88,16 @@ module DeviseTokenAuth
       end
     end
 
+    def build_resource(hash=nil)
+      self.resource = resource_class.new_with_session(hash || {}, session)
+    end
+
     def sign_up_params
       devise_parameter_sanitizer.sanitize(:sign_up)
     end
 
     def account_update_params
       devise_parameter_sanitizer.sanitize(:account_update)
-    end
-
-    def configure_devise_token_auth_permitted_parameters
-      devise_parameter_sanitizer.for(:sign_up) << :confirm_success_url
     end
   end
 end

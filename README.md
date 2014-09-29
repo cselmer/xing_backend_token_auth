@@ -20,11 +20,33 @@ This gem provides the following features:
 * Support for [multiple user models](https://github.com/lynndylanhurley/devise_token_auth#using-multiple-models).
 * It is [secure](#security).
 
-# Demo
+# [Live Demo](http://ng-token-auth-demo.herokuapp.com/)
 
 [Here is a demo](http://ng-token-auth-demo.herokuapp.com/) of this app running with the [ng-token-auth](https://github.com/lynndylanhurley/ng-token-auth) module.
 
 The fully configured api used in the demo can be found [here](https://github.com/lynndylanhurley/devise_token_auth_demo).
+
+# Table of Contents
+
+* [Dependencies](#dependencies)
+* [Configuration TL;DR](#configuration-tldr)
+* [Usage TL;DR](#usage-tldr)
+* [Configuration Continued](#configuration-cont)
+  * [Initializer Settings](#initializer-settings)
+  * [OmniAuth Authentication](#omniauth-authentication)
+  * [OmniAuth Provider Settings](#omniauth-provider-settings)
+  * [Email Authentication](#email-authentication)
+  * [Cross Origin Requests (CORS)](#cors)
+* [Usage Continued](#usage-cont)
+  * [Mounting Routes](#mounting-routes)
+  * [Controller Integration](#controller-concerns)
+  * [Model Integration](#model-concerns)
+  * [Using Multiple User Classes](#using-multiple-models)
+* [Conceptual Diagrams](#conceptual)
+  * [Token Management](#about-token-management)
+  * [Batch Requests](#about-batch-requests)
+* [Security](#security)
+* [Contribution Guidelines](#contributing)
 
 # Dependencies
 This project leverages the following gems:
@@ -266,47 +288,66 @@ The authentication routes must be mounted to your project. This gem includes a r
 mount_devise_token_auth_for 'User', at: '/auth'
 ~~~
 
-Any model class can be used, but the class will need to include [`DeviseTokenAuth::Concerns::SetUserByToken`](#model-concerns) for authentication to work properly.
+Any model class can be used, but the class will need to include [`DeviseTokenAuth::Concerns::User`](#model-concerns) for authentication to work properly.
 
 You can mount this engine to any route that you like. `/auth` is used by default to conform with the defaults of the [ng-token-auth](https://github.com/lynndylanhurley/ng-token-auth) module.
 
 
-## Controller Concerns
+## Controller Methods
 
-##### DeviseTokenAuth::Concerns::SetUserByToken
+### Concerns
 
-This gem includes a [Rails concern](http://api.rubyonrails.org/classes/ActiveSupport/Concern.html) called `DeviseTokenAuth::Concerns::SetUserByToken`. This concern can be used in controllers to identify users by their authentication headers.
-
-This concern runs a [before_action](http://guides.rubyonrails.org/action_controller_overview.html#filters), setting the `@user` variable for use in your controllers. The user will be signed in via devise for the duration of the request.
+This gem includes a [Rails concern](http://api.rubyonrails.org/classes/ActiveSupport/Concern.html) called `DeviseTokenAuth::Concerns::SetUserByToken`. Include this concern to provide access to [controller methods](#controller-methods) such as [`authenticate_user!`](#authenticate-user), [`user_signed_in?`](#user-signed-in), etc.
 
 The concern also runs an [after_action](http://guides.rubyonrails.org/action_controller_overview.html#filters) that changes the auth token after each request.
 
 It is recommended to include the concern in your base `ApplicationController` so that all children of that controller include the concern as well.
+
+##### Concern example:
 
 ~~~ruby
 # app/controllers/application_controller.rb
 class ApplicationController < ActionController::Base
   include DeviseTokenAuth::Concerns::SetUserByToken
 end
+~~~
 
+### Methods
+
+This gem provides access to all of the following [devise helpers](https://github.com/plataformatec/devise#controller-filters-and-helpers):
+
+| Method | Description |
+|---|---|
+| **`before_action :authenticate_user!`** | Returns a 401 error unless a `User` is signed-in. |
+| **`current_user`** | Returns the currently signed-in `User`, or `nil` if unavailable. |
+| **`user_signed_in?`** | Returns `true` if a `User` is signed in, otherwise `false`. |
+| **`devise_token_auth_group`** | Operate on multiple user classes as a group. [Read more](#group-access) |
+
+Note that if the model that you're trying to access isn't called `User`, the helper method names will change. For example, if the user model is called `Admin`, the methods would look like this:
+
+* `before_action :authenticate_admin!`
+* `admin_signed_in?`
+* `current_admin`
+
+
+##### Example: limit access to authenticated users
+~~~ruby
 # app/controllers/test_controller.rb
 class TestController < ApplicationController
+  before_action :authenticate_user!
+  
   def members_only
-    if @user
-      render json: {
-        data: {
-          message: "Welcome #{@user.name}",
-          user: @user
-        }
-      }, status: 200
-    else
-      render json: {
-        errors: ["Authorized users only."]
-      }, status: 401
-    end
+    render json: {
+      data: {
+        message: "Welcome #{current_user.name}",
+        user: current_user
+      }
+    }, status: 200
   end
 end
 ~~~
+
+### Token Header Format
 
 The authentication information should be included by the client in the headers of each request. The headers follow the [RFC 6750 Bearer Token](http://tools.ietf.org/html/rfc6750) format:
 
@@ -332,11 +373,11 @@ The authentication headers required for each request will be available in the re
 
 ## Model Concerns
 
-##### DeviseTokenAuth::Concerns::SetUserByToken
+##### DeviseTokenAuth::Concerns::User
 
 Typical use of this gem will not require the use of any of the following model methods. All authentication should be handled invisibly by the [controller concerns](#controller-concerns) described above.
 
-Models that include the `DeviseTokenAuth::Concerns::SetUserByToken` concern will have access to the following public methods (read the above section for context on `token` and `client`):
+Models that include the `DeviseTokenAuth::Concerns::User` concern will have access to the following public methods (read the above section for context on `token` and `client`):
 
 * **`valid_token?`**: check if an authentication token is valid. Accepts a `token` and `client` as arguments. Returns a boolean.
 
@@ -386,6 +427,8 @@ Models that include the `DeviseTokenAuth::Concerns::SetUserByToken` concern will
 
 ## Using multiple models
 
+### [View Live Multi-User Demo](http://ng-token-auth-demo.herokuapp.com/multi-user)
+
 This gem supports the use of multiple user models. One possible use case is to authenticate visitors using a model called `User`, and to authenticate administrators with a model called `Admin`. Take the following steps to add another authentication model to your app:
 
 1. Run the install generator for the new model.
@@ -420,6 +463,40 @@ This gem supports the use of multiple user models. One possible use case is to a
     end
   end
   ~~~
+  
+1. Configure any `Admin` restricted controllers. Controllers will now have access to the methods [described here](#methods):
+  * `before_action: :authenticate_admin!`
+  * `current_admin`
+  * `admin_signed_in?`
+
+
+### Group access
+
+It is also possible to control access to multiple user types at the same time using groups. The following example shows how to limit controller access to both `User` and `Admin` users.
+
+##### Example: group authentication
+
+~~~ruby
+class DemoGroupController < ApplicationController
+  devise_token_auth_group :member, contains: [:user, :admin]
+  before_action :authenticate_member!
+  
+  def members_only
+    render json: {
+      data: {
+        message: "Welcome #{current_member.name}",
+        user: current_member
+      }
+    }, status: 200
+  end
+end
+~~~
+
+In the above example, the following methods will be available (in addition to `current_user`, `current_admin`, etc.):
+
+  * `before_action: :authenticate_member!`
+  * `current_member`
+  * `member_signed_in?`
 
 # Conceptual
 

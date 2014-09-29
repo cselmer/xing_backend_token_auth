@@ -33,6 +33,7 @@ group :development, :test do
   gem 'guard-minitest'
   gem 'faker'
   gem 'fuzz_ball'
+  gem 'byebug'
 end
 
 # code coverage, metrics

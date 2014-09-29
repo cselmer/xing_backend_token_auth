@@ -1,9 +1,6 @@
 module DeviseTokenAuth
-  class PasswordsController < Devise::PasswordsController
-    include Devise::Controllers::Helpers
-    include DeviseTokenAuth::Concerns::SetUserByToken
-
-    skip_before_filter :set_user_by_token, :only => [:create, :edit]
+  class PasswordsController < DeviseTokenAuth::ApplicationController
+    before_filter :set_user_by_token, :only => [:update]
     skip_after_filter :update_auth_header, :only => [:create, :edit]
 
     # this action is responsible for generating password reset tokens and
@@ -16,7 +13,7 @@ module DeviseTokenAuth
         }, status: 401
       end
 
-      unless resource_params[:redirect_url]
+      unless params[:redirect_url]
         return render json: {
           success: false,
           errors: ['Missing redirect url.']
@@ -30,12 +27,10 @@ module DeviseTokenAuth
       errors = nil
 
       if @user
-        @user.update_attributes({
-          reset_password_redirect_url: resource_params[:redirect_url]
-        })
-
-        @user = resource_class.send_reset_password_instructions({
-          email: resource_params[:email]
+        @user.send_reset_password_instructions({
+          email: resource_params[:email],
+          redirect_url: params[:redirect_url],
+          client_config: params[:config_name]
         })
 
         if @user.errors.empty?
@@ -77,12 +72,16 @@ module DeviseTokenAuth
           expiry: expiry
         }
 
+        # ensure that user is confirmed
+        @user.skip_confirmation! unless @user.confirmed_at
+
         @user.save!
 
-        redirect_to(@user.build_auth_url(resource_params[:redirect_url], {
+        redirect_to(@user.build_auth_url(params[:redirect_url], {
           token:          token,
           client_id:      client_id,
-          reset_password: true
+          reset_password: true,
+          config:         params[:config]
         }))
       else
         raise ActionController::RoutingError.new('Not Found')
@@ -127,7 +126,8 @@ module DeviseTokenAuth
     end
 
     def resource_params
-      params.permit(:email, :password, :password_confirmation, :reset_password_token, :redirect_url)
+      params.permit(:email, :password, :password_confirmation, :reset_password_token)
     end
+
   end
 end
