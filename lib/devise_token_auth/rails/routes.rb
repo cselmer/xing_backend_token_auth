@@ -6,10 +6,10 @@ module ActionDispatch::Routing
           :class_name  => resource,
           :module      => :devise,
           :path        => "",
-          :controllers => {:sessions      => "devise_token_auth/sessions",
+          :controllers => (opts[:controllers] || {}).reverse_merge({:sessions      => "devise_token_auth/sessions",
                            :registrations => "devise_token_auth/registrations",
                            :passwords     => "devise_token_auth/passwords",
-                           :confirmations => "devise_token_auth/confirmations"}
+                           :confirmations => "devise_token_auth/confirmations"})
 
         devise_scope resource.underscore.to_sym do
           get "validate_token",      to: "devise_token_auth/auth#validate_token"

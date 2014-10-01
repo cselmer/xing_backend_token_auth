@@ -4,7 +4,9 @@ Rails.application.routes.draw do
   # within a `devise_scope` block
 
   # define :users as the first devise mapping:
-  mount_devise_token_auth_for 'User', at: '/auth'
+  mount_devise_token_auth_for 'User', at: '/auth', controllers: {
+    registrations: 'registrations'
+  }
 
   # define :mangs as the second devise mapping. routes using this class will
   # need to be defined within a devise_scope as shown below
