@@ -205,12 +205,3 @@ Devise.setup do |config|
     manager.failure_app = TokenAuthFailureApp
   end
 end
-
-
-#module Devise::Mailers::Helpers
-  #protected
-
-  #def headers_for
-
-  #end
-#end

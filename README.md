@@ -42,6 +42,9 @@ The fully configured api used in the demo can be found [here](https://github.com
   * [Controller Integration](#controller-concerns)
   * [Model Integration](#model-concerns)
   * [Using Multiple User Classes](#using-multiple-models)
+  * [Skip Confirmation Upon Email Registration](#skip-confirmation-upon-registration)
+  * [Custom Controller Overrides](#custom-controller-overrides)
+  * [Email Template Overrides](#email-template-overrides)
 * [Conceptual Diagrams](#conceptual)
   * [Token Management](#about-token-management)
   * [Batch Requests](#about-batch-requests)
@@ -75,12 +78,18 @@ You will need to create a [user model](#model-concerns), [define routes](#mounti
 rails g devise_token_auth:install [USER_CLASS] [MOUNT_PATH]
 ~~~
 
+**Example**:
+
+~~~bash
+rails g devise_token_auth:install User /auth
+~~~
+
 This generator accepts the following optional arguments:
 
 | Argument | Default | Description |
 |---|---|---|
 | USER_CLASS | `User` | The name of the class to use for user authentication. |
-| MOUNT_PATH | `auth` | The path at which to mount the authentication routes. [Read more](#usage). |
+| MOUNT_PATH | `/auth` | The path at which to mount the authentication routes. [Read more](#usage). |
 
 The following events will take place when using the install generator:
 
@@ -497,6 +506,95 @@ In the above example, the following methods will be available (in addition to `c
   * `before_action: :authenticate_member!`
   * `current_member`
   * `member_signed_in?`
+
+## Skip Confirmation Upon Email Registration
+
+By default, an email is sent containing a link that the user must visit to activate their account. This measure is in place to ensure that users cannot register other people for accounts.
+
+To bypass this measure, add `before_create :skip_confirmation!` to your `User` model (or equivalent).
+
+##### Example: bypass email confirmation
+
+~~~ruby
+class User < ActiveRecord::Base
+  include DeviseTokenAuth::Concerns::User
+  before_create :skip_confirmation!
+end
+~~~
+
+##### Note for ng-token-auth users:
+
+If this `before_create :skip_confirmation!` callback is in place, the `$auth.submitRegistration` method will both register and authenticate users in a single step.
+
+## Custom Controller Overrides
+
+The built-in controllers can be overridden with your own custom controllers. 
+
+For example, the default behavior of the [`validate_token`](https://github.com/lynndylanhurley/devise_token_auth/blob/8a33d25deaedb4809b219e557e82ec7ec61bf940/app/controllers/devise_token_auth/token_validations_controller.rb#L6) method of the [`TokenValidationController`](https://github.com/lynndylanhurley/devise_token_auth/blob/8a33d25deaedb4809b219e557e82ec7ec61bf940/app/controllers/devise_token_auth/token_validations_controller.rb) is to return the `User` object as json (sans password and token data). The following example shows how to override the `validate_token` action to include a model method as well.
+
+##### Example: controller overrides
+
+~~~ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  ...  
+  mount_devise_token_auth_for 'User', at: '/auth', controllers: {
+    token_validations:  'overrides/token_validations'
+  }
+end
+
+# app/controllers/overrides/token_validations_controller.rb
+module Overrides
+  class TokenValidationsController < DeviseTokenAuth::TokenValidationsController
+
+    def validate_token
+      # @user will have been set by set_user_by_token concern
+      if @user
+        render json: {
+          data: @user.as_json(methods: :calculate_operating_thetan)
+        }
+      else
+        render json: {
+          success: false,
+          errors: ["Invalid login credentials"]
+        }, status: 401
+      end
+    end
+  end
+end
+~~~
+
+##### Example: all :controller options with default settings:
+
+~~~ruby
+mount_devise_token_auth_for 'User', at: '/auth', controllers: {
+  confirmations:      'devise_token_auth/confirmations',
+  passwords:          'devise_token_auth/passwords',
+  omniauth_callbacks: 'devise_token_auth/omniauth_callbacks',
+  registrations:      'devise_token_auth/registrations',
+  sessions:           'devise_token_auth/sessions',
+  token_validations:  'devise_token_auth/token_validations'
+}
+~~~
+
+**Note:** Controller overrides must implement the expected actions of the controllers that they replace.
+
+## Email Template Overrides
+
+You will probably want to override the default email templates for email sign-up and password-reset confirmation. Run the following command to copy the email templates into your app:
+
+~~~bash
+rails generate devise_token_auth:install_views
+~~~
+
+This will create two new files:
+
+* `app/views/devise/mailer/reset_password_instructions.html.erb`
+* `app/views/devise/mailer/confirmation_instructions.html.erb`
+
+These files may be edited to suit your taste.
+
+**Note:** if you choose to modify these templates, do not modify the `link_to` blocks unless you absolutely know what you are doing.
 
 # Conceptual
 

@@ -21,12 +21,29 @@ module DeviseTokenAuth
       end
 
       begin
-        if resource.save
-          if defined?(resource.confirmed?)
+         # override email confirmation, must be sent manually from ctrl
+        User.skip_callback("create", :after, :send_on_create_confirmation_instructions)
+
+	      if resource.save
+          if defined?(resource.confirmed?) and !resource.confirmed?
             resource.send_confirmation_instructions({
               client_config: params[:config_name],
               redirect_url: params[:confirm_success_url]
             })
+          else
+            # email auth has been bypassed, authenticate user
+            @user      = resource
+            @client_id = SecureRandom.urlsafe_base64(nil, false)
+            @token     = SecureRandom.urlsafe_base64(nil, false)
+
+            @user.tokens[@client_id] = {
+              token: BCrypt::Password.create(@token),
+              expiry: (Time.now + DeviseTokenAuth.token_lifespan).to_i
+            }
+
+            @user.save!
+
+            update_auth_header
           end
 
           render json: {

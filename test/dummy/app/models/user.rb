@@ -1,7 +1,7 @@
 class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable,
         :recoverable, :rememberable, :trackable, :validatable,
-        :confirmable, :token_authenticatable
+        :confirmable, :omniauthable, :token_authenticatable
 
   validates :operating_thetan, numericality: true, allow_nil: true
   validate :ensure_correct_favorite_color
