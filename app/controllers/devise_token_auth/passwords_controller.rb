@@ -6,7 +6,7 @@ module DeviseTokenAuth
     # this action is responsible for generating password reset tokens and
     # sending emails
     def create
-      unless resource_params[:email]
+      unless resource_params[:email].present?
         return render json: {
           success: false,
           errors: ['You must provide an email address.']
