@@ -17,7 +17,9 @@ class DeviseTokenAuth::PasswordsControllerTest < ActionController::TestCase
       describe 'request password reset' do
         before do
           xhr :post, :create, {
-            email:        @user.email,
+            user: {
+              email:        @user.email
+            },
             redirect_url: @redirect_url
           }
 
@@ -113,8 +115,10 @@ class DeviseTokenAuth::PasswordsControllerTest < ActionController::TestCase
             @new_password = Faker::Internet.password
 
             xhr :put, :update, {
-              password: @new_password,
-              password_confirmation: @new_password
+              user: {
+                password: @new_password,
+                password_confirmation: @new_password
+              }
             }
 
             @user.reload
@@ -136,8 +140,10 @@ class DeviseTokenAuth::PasswordsControllerTest < ActionController::TestCase
             @new_password = Faker::Internet.password
 
             xhr :put, :update, {
-              password: 'chong',
-              password_confirmation: 'bong'
+              user: {
+                password: 'chong',
+                password_confirmation: 'bong'
+              }
             }
           end
 
@@ -152,8 +158,10 @@ class DeviseTokenAuth::PasswordsControllerTest < ActionController::TestCase
             @new_password = Faker::Internet.password
 
             xhr :put, :update, {
-              password: @new_password,
-              password_confirmation: @new_password
+              user: {
+                password: @new_password,
+                password_confirmation: @new_password
+              }
             }
           end
 
@@ -178,7 +186,9 @@ class DeviseTokenAuth::PasswordsControllerTest < ActionController::TestCase
         @redirect_url = 'http://ng-token-auth.dev'
 
         xhr :post, :create, {
-          email:        @user.email,
+          mang: {
+            email:        @user.email,
+          },
           redirect_url: @redirect_url
         }
 
@@ -209,7 +219,9 @@ class DeviseTokenAuth::PasswordsControllerTest < ActionController::TestCase
         @redirect_url = 'http://ng-token-auth.dev'
 
         xhr :post, :create, {
-          email:        @user.email,
+          user: {
+            email:        @user.email
+          },
           redirect_url: @redirect_url
         }
 
@@ -240,7 +252,9 @@ class DeviseTokenAuth::PasswordsControllerTest < ActionController::TestCase
         @config_name  = "altUser"
 
         xhr :post, :create, {
-          email:        @user.email,
+          user: {
+            email:        @user.email
+          },
           redirect_url: @redirect_url,
           config_name:  @config_name
         }

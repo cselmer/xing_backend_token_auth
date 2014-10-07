@@ -13,7 +13,9 @@ class Overrides::PasswordsControllerTest < ActionDispatch::IntegrationTest
       @redirect_url = Faker::Internet.url
 
       post "/evil_user_auth/password", {
-        email:        @user.email,
+        evil_user: {
+          email:        @user.email,
+        },
         redirect_url: @redirect_url
       }
 

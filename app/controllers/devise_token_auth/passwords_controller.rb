@@ -58,7 +58,7 @@ module DeviseTokenAuth
     # this is where users arrive after visiting the email confirmation link
     def edit
       @user = resource_class.reset_password_by_token({
-        reset_password_token: resource_params[:reset_password_token]
+        reset_password_token: params[:reset_password_token]
       })
 
       if @user and @user.id
@@ -122,11 +122,7 @@ module DeviseTokenAuth
     end
 
     def password_resource_params
-      params.permit(devise_parameter_sanitizer.for(:account_update))
-    end
-
-    def resource_params
-      params.permit(:email, :password, :password_confirmation, :reset_password_token)
+      devise_parameter_sanitizer.sanitize(:account_update)
     end
 
   end
