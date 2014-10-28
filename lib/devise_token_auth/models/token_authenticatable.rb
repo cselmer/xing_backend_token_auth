@@ -9,6 +9,7 @@ module Devise
         # can't set default on text fields in mysql, simulate here instead.
         after_save :set_empty_token_hash
         after_initialize :set_empty_token_hash
+        before_save :destroy_expired_tokens
 
         # override devise method to include additional info as opts hash
         def send_confirmation_instructions(opts=nil)
@@ -80,7 +81,7 @@ module Devise
           self.tokens[client_id]['token'] and
 
           # ensure that the token was created within the last two weeks
-          DateTime.strptime(self.tokens[client_id]['expiry'].to_s, '%s') > DeviseTokenAuth.token_lifespan.ago and
+          DateTime.strptime(self.tokens[client_id]['expiry'].to_s, '%s') > Time.now and
 
           # ensure that the token is valid
           BCrypt::Password.new(self.tokens[client_id]['token']) == token
@@ -181,6 +182,13 @@ module Devise
 
       def set_empty_token_hash
         self.tokens ||= {} if has_attribute?(:tokens)
+      end
+
+      def destroy_expired_tokens
+        self.tokens.delete_if{|cid,v|
+          expiry = v[:expiry] || v["expiry"]
+          DateTime.strptime(expiry.to_s, '%s') < Time.now
+        }
       end
     end
   end

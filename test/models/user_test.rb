@@ -37,5 +37,45 @@ class UserTest < ActiveSupport::TestCase
         assert @user.save
       end
     end
+
+    describe 'token expiry' do
+      before do
+        @user = users(:confirmed_email_user)
+        @user.skip_confirmation!
+        @user.save!
+
+        @auth_headers = @user.create_new_auth_token
+
+        @token     = @auth_headers['access-token']
+        @client_id = @auth_headers['client']
+      end
+
+      test 'should properly indicate whether token is current' do
+        assert @user.token_is_current?(@token, @client_id)
+        # we want to update the expiry without forcing a cleanup (see below)
+        @user.tokens[@client_id]['expiry'] = Time.now.to_i - 10.seconds
+        refute @user.token_is_current?(@token, @client_id)
+      end
+    end
+
+    describe 'expired tokens are destroyed on save' do
+      before do
+        @user = users(:confirmed_email_user)
+        @user.skip_confirmation!
+        @user.save!
+
+        @old_auth_headers = @user.create_new_auth_token
+        @new_auth_headers = @user.create_new_auth_token
+        expire_token(@user, @old_auth_headers['client'])
+      end
+
+      test 'expired token was removed' do
+        refute @user.tokens[@old_auth_headers['client']]
+      end
+
+      test 'current token was not removed' do
+        assert @user.tokens[@new_auth_headers['client']]
+      end
+    end
   end
 end
