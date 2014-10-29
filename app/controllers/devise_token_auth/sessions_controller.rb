@@ -18,11 +18,7 @@ module DeviseTokenAuth
       }
       @user.save
       yield resource if block_given?
-      render json: {
-        data: resource.as_json(except: [
-            :tokens, :confirm_success_url, :reset_password_redirect_url, :created_at, :updated_at
-        ])
-      }
+      render json: resource_serializer(resource)
     end
 
     def auth_options
@@ -39,14 +35,10 @@ module DeviseTokenAuth
         user.tokens.delete(client_id)
         user.save!
 
-        render json: {
-          success:true
-        }, status: 200
+        render json: success_message, status: 200
 
       else
-        render json: {
-          errors: ["User was not found or was not logged in."]
-        }, status: 404
+        render json: error_messages("User was not found or was not logged in."), status: 404
       end
     end
 

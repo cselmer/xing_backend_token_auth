@@ -46,46 +46,26 @@ module DeviseTokenAuth
             update_auth_header
           end
 
-          render json: {
-            status: 'success',
-            data:   resource.as_json
-          }
+          render json: resource_serializer(resource)
         else
           clean_up_passwords resource
-          render json: {
-            status: 'error',
-            data:   resource,
-            errors: resource.errors.to_hash.merge(full_messages: resource.errors.full_messages)
-          }, status: 403
+          render json: error_serializer(resource), status: 403
         end
       rescue ActiveRecord::RecordNotUnique
         clean_up_passwords resource
-        render json: {
-          status: 'error',
-          data:   resource,
-          errors: ["An account already exists for #{resource.send(resource_class.authentication_keys.first)}"]
-        }, status: 403
+        render json: error_serializer(resource, "An account already exists for #{resource.send(resource_class.authentication_keys.first)}"), status: 403
       end
     end
 
     def update
       if @user
         if @user.update_attributes(account_update_params)
-          render json: {
-            status: 'success',
-            data:   @user.as_json
-          }
+          render json: resource_serializer(@user)
         else
-          render json: {
-            status: 'error',
-            errors: @user.errors
-          }, status: 403
+          render json: error_serializer(@user), status: 403
         end
       else
-        render json: {
-          status: 'error',
-          errors: ["User not found."]
-        }, status: 404
+        render json: error_messages("User not found."), status: 404
       end
     end
 
@@ -93,15 +73,9 @@ module DeviseTokenAuth
       if @user
         @user.destroy
 
-        render json: {
-          status: 'success',
-          message: "Account with uid #{@user.uid} has been destroyed."
-        }
+        render json: success_message("Account with uid #{@user.uid} has been destroyed.")
       else
-        render json: {
-          status: 'error',
-          errors: ["Unable to locate account for destruction."]
-        }, status: 404
+        render json: error_messages("Unable to locate account for destruction."), status: 404
       end
     end
 

@@ -6,18 +6,12 @@ module DeviseTokenAuth
     def validate_token
       # @user will have been set by set_user_token concern
       if @user
-        render json: {
-          success: true,
-          data: @user.as_json(except: [
-            :tokens, :created_at, :updated_at
-          ])
-        }
+        render json: resource_serializer(@user)
       else
-        render json: {
-          success: false,
-          errors: ["Invalid login credentials"]
-        }, status: 401
+        render json: error_messages("Invalid login credentials"), status: 401
       end
     end
+
+
   end
 end

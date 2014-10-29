@@ -7,17 +7,11 @@ module DeviseTokenAuth
     # sending emails
     def create
       unless resource_params[:email].present?
-        return render json: {
-          success: false,
-          errors: ['You must provide an email address.']
-        }, status: 401
+        return render json: error_messages('You must provide an email address.'), status: 401
       end
 
       unless params[:redirect_url]
-        return render json: {
-          success: false,
-          errors: ['Missing redirect url.']
-        }, status: 401
+        return render json: error_messages('Missing redirect url.'), status: 401
       end
 
       @user = resource_class.where({
@@ -34,11 +28,9 @@ module DeviseTokenAuth
         })
 
         if @user.errors.empty?
-          render json: {
-            success: true,
-            message: "An email has been sent to #{@user.email} containing "+
-              "instructions for resetting your password."
-          }
+          render json: success_message(
+            "An email has been sent to #{@user.email} containing instructions for resetting your password."
+          )
         else
           errors = @user.errors
         end
@@ -47,10 +39,7 @@ module DeviseTokenAuth
       end
 
       if errors
-        render json: {
-          success: false,
-          errors: errors
-        }, status: 400
+        render json: error_messages(*errors), status: 400
       end
     end
 
@@ -91,33 +80,18 @@ module DeviseTokenAuth
     def update
       # make sure user is authorized
       unless @user
-        return render json: {
-          success: false,
-          errors: ['Unauthorized']
-        }, status: 401
+        return render json: error_messages('Unauthorized'), status: 401
       end
 
       # ensure that password params were sent
       unless password_resource_params[:password] and password_resource_params[:password_confirmation]
-        return render json: {
-          success: false,
-          errors: ['You must fill out the fields labeled "password" and "password confirmation".']
-        }, status: 422
+        return render json: error_messages('You must fill out the fields labeled "password" and "password confirmation".'), status: 422
       end
 
       if @user.update_attributes(password_resource_params)
-        return render json: {
-          success: true,
-          data: {
-            user: @user,
-            message: "Your password has been successfully updated."
-          }
-        }
+        return render json: resource_serializer(@user)
       else
-        return render json: {
-          success: false,
-          errors: @user.errors
-        }, status: 422
+        return render json: error_serializer(@user), status: 422
       end
     end
 
