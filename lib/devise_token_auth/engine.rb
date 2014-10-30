@@ -12,7 +12,14 @@ module DeviseTokenAuth
   mattr_accessor :change_headers_on_each_request,
                  :token_lifespan,
                  :batch_request_buffer_throttle,
-                 :omniauth_prefix
+                 :omniauth_prefix,
+                 :session_serializer,
+                 :registration_serializer,
+                 :token_validation_serializer,
+                 :password_serializer,
+                 :error_serializer,
+                 :error_messages_serializer,
+                 :success_message_serializer
 
   self.change_headers_on_each_request = true
   self.token_lifespan                 = 2.weeks

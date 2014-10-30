@@ -13,5 +13,10 @@ module DeviseTokenAuth
     end
 
 
+    def resource_serializer(user)
+      serializer = DeviseTokenAuth.token_validation_serializer || ResourceSerializer
+      serializer.new(user)
+    end
+
   end
 end

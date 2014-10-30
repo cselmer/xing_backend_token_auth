@@ -42,5 +42,9 @@ module DeviseTokenAuth
       end
     end
 
+    def resource_serializer(user)
+      serializer = DeviseTokenAuth.session_serializer || ResourceSerializer
+      serializer.new(user)
+    end
   end
 end

@@ -99,5 +99,9 @@ module DeviseTokenAuth
       devise_parameter_sanitizer.sanitize(:account_update)
     end
 
+    def resource_serializer(user)
+      serializer = DeviseTokenAuth.password_serializer || ResourceSerializer
+      serializer.new(user)
+    end
   end
 end
