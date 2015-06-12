@@ -43,7 +43,6 @@ class UserTest < ActiveSupport::TestCase
         @user = users(:confirmed_email_user)
         @user.skip_confirmation!
         @user.save!
-
         @auth_headers = @user.create_new_auth_token
 
         @token     = @auth_headers['access-token']

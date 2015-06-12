@@ -77,14 +77,14 @@ module Devise
       def token_is_current?(token, client_id)
         return true if (
           # ensure that expiry and token are set
-          self.tokens[client_id]['expiry'] and
-          self.tokens[client_id]['token'] and
+          self.tokens[client_id][:expiry] and
+          self.tokens[client_id][:token] and
 
           # ensure that the token was created within the last two weeks
-          DateTime.strptime(self.tokens[client_id]['expiry'].to_s, '%s') > Time.now and
+          DateTime.strptime(self.tokens[client_id][:expiry].to_s, '%s') > Time.now and
 
           # ensure that the token is valid
-          BCrypt::Password.new(self.tokens[client_id]['token']) == token
+          BCrypt::Password.new(self.tokens[client_id][:token]) == token
         )
       end
 
@@ -118,10 +118,10 @@ module Devise
         end
 
         self.tokens[client_id] = {
-          token:      token_hash,
-          expiry:     expiry,
-          last_token: last_token,
-          updated_at: Time.now
+          'token':      token_hash,
+          'expiry':     expiry,
+          'last_token': last_token,
+          'updated_at': Time.now
        }
 
         self.save!
