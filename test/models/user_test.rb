@@ -69,7 +69,7 @@ class UserTest < ActiveSupport::TestCase
       end
 
       test 'expired token was removed' do
-        refute @user.tokens[@old_auth_headers['client']]
+        refute @user.tokens[@old_auth_headers[:client]]
       end
 
       test 'current token was not removed' do
