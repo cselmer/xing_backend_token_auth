@@ -18,7 +18,6 @@ class Overrides::ConfirmationsControllerTest < ActionDispatch::IntegrationTest
       })
 
       @mail              = ActionMailer::Base.deliveries.last
-      debugger
       @confirmation_path = @mail.body.match(/localhost([^\"]*)\"/)[1]
 
       # visit confirmation link
