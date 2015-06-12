@@ -121,10 +121,10 @@ module Devise
         end
 
         self.tokens[client_id] = {
-          'token':      token_hash,
-          'expiry':     expiry,
-          'last_token': last_token,
-          'updated_at': Time.now
+          token:      token_hash,
+          expiry:     expiry,
+          last_token: last_token,
+          updated_at: Time.now
        }
 
         self.save!
