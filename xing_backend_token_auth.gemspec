@@ -5,13 +5,13 @@ require "devise_token_auth/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
-  s.name        = "devise_token_auth"
+  s.name        = "xing_backend_token_auth"
   s.version     = DeviseTokenAuth::VERSION
-  s.authors     = ["Lynn Hurley"]
-  s.email       = ["lynn.dylan.hurley@gmail.com"]
-  s.homepage    = "http://github.com/lynndylanhurley/devise_token_auth"
+  s.authors     = ["Lynn Hurley", "Hannah Howard", "Judson Lester"]
+  s.email       = ["lynn.dylan.hurley@gmail.com", "hannah@lrdesign.com", "judson@lrdesign.com"]
+  s.homepage    = "http://github.com/RDesign/xing_backend_token_auth"
   s.summary     = "Token based authentication for rails. Uses Devise + OmniAuth."
-  s.description = "For use with client side single page apps such as the venerable https://github.com/lynndylanhurley/ng-token-auth."
+  s.description = "For use with client side single page apps such as https://github.com/lynndylanhurley/ng-token-auth."
   s.license     = "WTFPL"
 
   s.files      = Dir["{app,config,db,lib}/**/*", "LICENSE", "Rakefile", "README.md"]

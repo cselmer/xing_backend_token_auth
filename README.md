@@ -1,10 +1,15 @@
-![Serious Trust](https://github.com/lynndylanhurley/devise_token_auth/raw/master/test/dummy/app/assets/images/logo.jpg "Serious Trust")
+# XingTokenAuth
+### forked from DeviseTokenAuth
 
-[![Gem Version](https://badge.fury.io/rb/devise_token_auth.svg)](http://badge.fury.io/rb/devise_token_auth)
-[![Build Status](https://travis-ci.org/lynndylanhurley/devise_token_auth.svg?branch=master)](https://travis-ci.org/lynndylanhurley/devise_token_auth)
-[![Code Climate](http://img.shields.io/codeclimate/github/lynndylanhurley/devise_token_auth.svg)](https://codeclimate.com/github/lynndylanhurley/devise_token_auth)
-[![Test Coverage](http://img.shields.io/codeclimate/coverage/github/lynndylanhurley/devise_token_auth.svg)](https://codeclimate.com/github/lynndylanhurley/devise_token_auth)
-[![Dependency Status](https://gemnasium.com/lynndylanhurley/devise_token_auth.svg)](https://gemnasium.com/lynndylanhurley/devise_token_auth)
+DeviseTokenAuth makes a number of assumptions about how underlying
+authentication tasks should be handled which are incompatible with some of the
+underlying principles of Xing. Over the next few weeks, expect XingTokenAuth
+(and it's yet to be released companion JS module) to diverge significantly from
+the Devise/NgTokenAuth approach.
+
+_the remainder of this README are near-verbatim from DeviseTokenAuth_
+
+_as a result, there may be errors due to an incomplete tranfer - please issue an MR!_
 
 ## Simple, secure token based authentication for Rails.
 
@@ -61,7 +66,7 @@ This project leverages the following gems:
 Add the following to your `Gemfile`:
 
 ~~~ruby
-gem 'devise_token_auth'
+gem 'xing_backend_token_auth'
 ~~~
 
 Then install the gem using bundle:
