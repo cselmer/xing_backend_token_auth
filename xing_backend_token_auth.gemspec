@@ -1,12 +1,9 @@
 $:.push File.expand_path("../lib", __FILE__)
 
-# Maintain your gem's version:
-require "devise_token_auth/version"
-
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
   s.name        = "xing_backend_token_auth"
-  s.version     = "0.1.31"
+  s.version     = "0.1.32"
   s.authors     = ["Lynn Hurley", "Hannah Howard", "Judson Lester"]
   s.email       = ["lynn.dylan.hurley@gmail.com", "hannah@lrdesign.com", "judson@lrdesign.com"]
   s.homepage    = "http://github.com/RDesign/xing_backend_token_auth"
