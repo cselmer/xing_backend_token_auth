@@ -73,8 +73,12 @@ module DeviseTokenAuth
           config:         params[:config]
         }))
       else
-        raise ActionController::RoutingError.new('Not Found')
+        password_reset_rejection
       end
+    end
+
+    def password_reset_rejection
+      raise ActionController::RoutingError.new('Not Found')
     end
 
     def update
