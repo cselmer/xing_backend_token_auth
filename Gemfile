@@ -1,4 +1,4 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
 # Declare your gem's dependencies in devise_token_auth.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
@@ -13,30 +13,28 @@ gemspec
 # To use debugger
 # gem 'debugger'
 
-group :development, :test do
-  gem 'thor'
-  gem "figaro",                 :github => 'laserlemon/figaro'
-  gem 'omniauth-github',        :git => 'git://github.com/intridea/omniauth-github.git'
-  gem 'omniauth-facebook',      :git => 'git://github.com/mkdynamic/omniauth-facebook.git'
-  gem 'omniauth-google-oauth2', :git => 'git://github.com/zquestz/omniauth-google-oauth2.git'
-  gem 'rack-cors',              :require => 'rack/cors'
-  gem 'attr_encrypted'
+gem 'bigdecimal', '~> 1.3.5'
+gem 'rake', '~> 10.0.0'
 
-  # testing
-  #gem 'spring'
-  #gem 'byebug'
-  gem 'minitest'
-  gem 'minitest-rails'
-  gem 'minitest-focus'
-  gem 'minitest-reporters'
-  gem 'guard'
-  gem 'guard-minitest'
-  gem 'faker'
-  gem 'fuzz_ball'
+group :development, :test do
+  gem 'attr_encrypted'
   gem 'byebug'
+  gem 'faker'
+  gem 'figaro', git: 'https://github.com/laserlemon/figaro'
+  gem 'fuzz_ball'
+  gem 'minitest'
+  gem 'minitest-focus'
+  gem 'minitest-rails'
+  gem 'minitest-reporters'
+  gem 'omniauth', '~> 1.0'
+  gem 'omniauth-facebook', git: 'https://github.com/mkdynamic/omniauth-facebook.git'
+  gem 'omniauth-github', git: 'https://github.com/intridea/omniauth-github.git', tag: 'v1.4.0'
+  gem 'omniauth-google-oauth2', git: 'https://github.com/zquestz/omniauth-google-oauth2.git', branch: 'v0.8.2'
+  gem 'rack-cors', require: 'rack/cors'
+  gem 'thor'
 end
 
 # code coverage, metrics
 group :test do
-  gem "codeclimate-test-reporter", require: nil
+  gem 'codeclimate-test-reporter', require: nil
 end

@@ -9,7 +9,7 @@ module DeviseTokenAuth::Concerns::SetUserByToken
 
   # keep track of request duration
   def set_request_start
-    @request_started_at = Time.now
+    @request_started_at = Time.zone.now
   end
 
   # user auth

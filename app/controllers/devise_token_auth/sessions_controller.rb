@@ -1,20 +1,20 @@
 # see http://www.emilsoman.com/blog/2013/05/18/building-a-tested/
 module DeviseTokenAuth
   class SessionsController < DeviseTokenAuth::ApplicationController
-    before_filter :set_user_by_token, :only => [:destroy]
+    before_filter :set_user_by_token, only: [:destroy]
     prepend_before_filter :allow_params_authentication!, only: :create
-    prepend_before_filter only: [ :create, :destroy ] { request.env["devise.skip_timeout"] = true }
+    prepend_before_filter :set_devise_skip_timeout_to_true, only: %i[create destroy]
 
     def create
       self.resource = warden.authenticate!(auth_options)
-      sign_in(resource_name, resource, :store => false)
+      sign_in(resource_name, resource, store: false)
       @user = resource
       @client_id = SecureRandom.urlsafe_base64(nil, false)
       @token     = SecureRandom.urlsafe_base64(nil, false)
 
       @user.tokens[@client_id] = {
         token: BCrypt::Password.create(@token),
-        expiry: (Time.now + DeviseTokenAuth.token_lifespan).to_i
+        expiry: (Time.zone.now + DeviseTokenAuth.token_lifespan).to_i
       }
       @user.save
       yield resource if block_given?
@@ -38,13 +38,19 @@ module DeviseTokenAuth
         render json: success_message, status: 200
 
       else
-        render json: error_messages("User was not found or was not logged in."), status: 404
+        render json: error_messages('User was not found or was not logged in.'), status: 404
       end
     end
 
     def resource_serializer(user)
       serializer = DeviseTokenAuth.session_serializer || ResourceSerializer
       serializer.new(user)
+    end
+
+    private
+
+    def set_devise_skip_timeout_to_true
+      request.env['devise.skip_timeout'] = true
     end
   end
 end

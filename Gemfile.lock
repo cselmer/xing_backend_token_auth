@@ -1,88 +1,96 @@
 GIT
-  remote: git://github.com/intridea/omniauth-github.git
-  revision: 21fa5e1a7295a11eae42846690b1eee88e57c23a
+  remote: https://github.com/intridea/omniauth-github.git
+  revision: e67834bc7bb4c4a8b0c439ea8705aad8e5344bc8
+  tag: v1.4.0
   specs:
-    omniauth-github (1.1.2)
-      omniauth (~> 1.0)
-      omniauth-oauth2 (~> 1.1)
+    omniauth-github (1.4.0)
+      omniauth (~> 1.5)
+      omniauth-oauth2 (>= 1.4.0, < 2.0)
 
 GIT
-  remote: git://github.com/laserlemon/figaro.git
-  revision: 9f54872dfc1a972b4a971211706272f0f38495f4
+  remote: https://github.com/laserlemon/figaro
+  revision: 6ae998e8209a08f91a165822abecffc0a0626814
   specs:
-    figaro (1.0.0.rc1)
-      thor (~> 0.14)
+    figaro (1.2.0)
+      thor (>= 0.14.0, < 2)
 
 GIT
-  remote: git://github.com/mkdynamic/omniauth-facebook.git
-  revision: ee4fb4dd6f664b3223974c229fda36169309e9ec
+  remote: https://github.com/mkdynamic/omniauth-facebook.git
+  revision: 250bb67d2f522ce95748ebe72026935ca819b672
   specs:
-    omniauth-facebook (2.0.0)
+    omniauth-facebook (9.0.0)
       omniauth-oauth2 (~> 1.2)
 
 GIT
-  remote: git://github.com/zquestz/omniauth-google-oauth2.git
-  revision: a40a748be080cd3a83808ef98afcbf590d7ffbba
+  remote: https://github.com/zquestz/omniauth-google-oauth2.git
+  revision: 7e8a75ba506dc559e089beca72eacf4fd4e600d9
+  branch: v0.8.2
   specs:
-    omniauth-google-oauth2 (0.2.5)
-      omniauth (> 1.0)
-      omniauth-oauth2 (~> 1.1)
+    omniauth-google-oauth2 (0.8.2)
+      jwt (>= 2.0)
+      oauth2 (~> 1.1)
+      omniauth (~> 1.1)
+      omniauth-oauth2 (>= 1.6)
 
 PATH
   remote: .
   specs:
-    xing_backend_token_auth (0.1.32)
+    xing_backend_token_auth (0.1.33)
+      bigdecimal (~> 1.3.5)
       devise (~> 3.2)
       rails (~> 4.1)
+      sprockets (< 4)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    actionmailer (4.1.6)
-      actionpack (= 4.1.6)
-      actionview (= 4.1.6)
+    actionmailer (4.2.11.3)
+      actionpack (= 4.2.11.3)
+      actionview (= 4.2.11.3)
+      activejob (= 4.2.11.3)
       mail (~> 2.5, >= 2.5.4)
-    actionpack (4.1.6)
-      actionview (= 4.1.6)
-      activesupport (= 4.1.6)
-      rack (~> 1.5.2)
+      rails-dom-testing (~> 1.0, >= 1.0.5)
+    actionpack (4.2.11.3)
+      actionview (= 4.2.11.3)
+      activesupport (= 4.2.11.3)
+      rack (~> 1.6)
       rack-test (~> 0.6.2)
-    actionview (4.1.6)
-      activesupport (= 4.1.6)
+      rails-dom-testing (~> 1.0, >= 1.0.5)
+      rails-html-sanitizer (~> 1.0, >= 1.0.2)
+    actionview (4.2.11.3)
+      activesupport (= 4.2.11.3)
       builder (~> 3.1)
       erubis (~> 2.7.0)
-    activemodel (4.1.6)
-      activesupport (= 4.1.6)
+      rails-dom-testing (~> 1.0, >= 1.0.5)
+      rails-html-sanitizer (~> 1.0, >= 1.0.3)
+    activejob (4.2.11.3)
+      activesupport (= 4.2.11.3)
+      globalid (>= 0.3.0)
+    activemodel (4.2.11.3)
+      activesupport (= 4.2.11.3)
       builder (~> 3.1)
-    activerecord (4.1.6)
-      activemodel (= 4.1.6)
-      activesupport (= 4.1.6)
-      arel (~> 5.0.0)
-    activesupport (4.1.6)
-      i18n (~> 0.6, >= 0.6.9)
-      json (~> 1.7, >= 1.7.7)
+    activerecord (4.2.11.3)
+      activemodel (= 4.2.11.3)
+      activesupport (= 4.2.11.3)
+      arel (~> 6.0)
+    activesupport (4.2.11.3)
+      i18n (~> 0.7)
       minitest (~> 5.1)
-      thread_safe (~> 0.1)
+      thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
-    ansi (1.4.3)
-    arel (5.0.1.20140414130214)
+    ansi (1.5.0)
+    arel (6.0.4)
     attr_encrypted (1.3.2)
       encryptor (>= 1.3.0)
-    bcrypt (3.1.10)
-    builder (3.2.2)
-    byebug (3.4.0)
-      columnize (~> 0.8)
-      debugger-linecache (~> 1.2)
-      slop (~> 3.6)
-    celluloid (0.15.2)
-      timers (~> 1.1.0)
+    bcrypt (3.1.18)
+    bigdecimal (1.3.5)
+    builder (3.2.4)
+    byebug (11.1.3)
     codeclimate-test-reporter (0.4.0)
       simplecov (>= 0.7.1, < 1.0.0)
-    coderay (1.1.0)
-    columnize (0.8.9)
-    concurrent-ruby (1.0.0)
-    debugger-linecache (1.2.0)
-    devise (3.5.3)
+    concurrent-ruby (1.1.10)
+    crass (1.0.6)
+    devise (3.5.10)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
       railties (>= 3.2.6, < 5)
@@ -94,34 +102,25 @@ GEM
     erubis (2.7.0)
     faker (1.4.3)
       i18n (~> 0.5)
-    faraday (0.9.0)
-      multipart-post (>= 1.2, < 3)
-    ffi (1.9.3)
-    formatador (0.2.5)
+    faraday (2.5.2)
+      faraday-net_http (>= 2.0, < 3.1)
+      ruby2_keywords (>= 0.0.4)
+    faraday-net_http (3.0.0)
     fuzz_ball (0.9.1)
-    guard (2.6.1)
-      formatador (>= 0.2.4)
-      listen (~> 2.7)
-      lumberjack (~> 1.0)
-      pry (>= 0.9.12)
-      thor (>= 0.18.1)
-    guard-minitest (2.3.1)
-      guard (~> 2.0)
-      minitest (>= 3.0)
-    hashie (3.2.0)
-    i18n (0.7.0)
-    json (1.8.3)
-    jwt (1.0.0)
-    listen (2.7.9)
-      celluloid (>= 0.15.2)
-      rb-fsevent (>= 0.9.3)
-      rb-inotify (>= 0.9)
-    lumberjack (1.0.9)
-    mail (2.6.3)
-      mime-types (>= 1.16, < 3)
-    method_source (0.8.2)
-    mime-types (2.99)
-    minitest (5.7.0)
+    globalid (0.4.2)
+      activesupport (>= 4.2.0)
+    hashie (5.0.0)
+    i18n (0.9.5)
+      concurrent-ruby (~> 1.0)
+    jwt (2.5.0)
+    loofah (2.19.0)
+      crass (~> 1.0.2)
+      nokogiri (>= 1.5.9)
+    mail (2.7.1)
+      mini_mime (>= 0.1.1)
+    mini_mime (1.1.2)
+    mini_portile2 (2.8.0)
+    minitest (5.16.3)
     minitest-focus (1.1.0)
       minitest (>= 4, < 6)
     minitest-rails (2.2.0)
@@ -132,76 +131,78 @@ GEM
       builder
       minitest (>= 5.0)
       ruby-progressbar
-    multi_json (1.10.1)
-    multi_xml (0.5.5)
-    multipart-post (2.0.0)
-    mysql2 (0.3.16)
-    oauth2 (1.0.0)
-      faraday (>= 0.8, < 0.10)
-      jwt (~> 1.0)
+    multi_json (1.15.0)
+    multi_xml (0.6.0)
+    nokogiri (1.13.8)
+      mini_portile2 (~> 2.8.0)
+      racc (~> 1.4)
+    oauth2 (1.4.11)
+      faraday (>= 0.17.3, < 3.0)
+      jwt (>= 1.0, < 3.0)
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
-      rack (~> 1.2)
-    omniauth (1.2.2)
-      hashie (>= 1.2, < 4)
-      rack (~> 1.0)
-    omniauth-oauth2 (1.2.0)
-      faraday (>= 0.8, < 0.10)
-      multi_json (~> 1.3)
-      oauth2 (~> 1.0)
-      omniauth (~> 1.2)
+      rack (>= 1.2, < 4)
+    omniauth (1.9.2)
+      hashie (>= 3.4.6)
+      rack (>= 1.6.2, < 3)
+    omniauth-oauth2 (1.7.3)
+      oauth2 (>= 1.4, < 3)
+      omniauth (>= 1.9, < 3)
     orm_adapter (0.5.0)
-    pg (0.17.1)
-    pry (0.10.1)
-      coderay (~> 1.1.0)
-      method_source (~> 0.8.1)
-      slop (~> 3.4)
-    rack (1.5.3)
+    pg (1.4.3)
+    racc (1.6.0)
+    rack (1.6.13)
     rack-cors (0.2.9)
     rack-test (0.6.3)
       rack (>= 1.0)
-    rails (4.1.6)
-      actionmailer (= 4.1.6)
-      actionpack (= 4.1.6)
-      actionview (= 4.1.6)
-      activemodel (= 4.1.6)
-      activerecord (= 4.1.6)
-      activesupport (= 4.1.6)
+    rails (4.2.11.3)
+      actionmailer (= 4.2.11.3)
+      actionpack (= 4.2.11.3)
+      actionview (= 4.2.11.3)
+      activejob (= 4.2.11.3)
+      activemodel (= 4.2.11.3)
+      activerecord (= 4.2.11.3)
+      activesupport (= 4.2.11.3)
       bundler (>= 1.3.0, < 2.0)
-      railties (= 4.1.6)
-      sprockets-rails (~> 2.0)
-    railties (4.1.6)
-      actionpack (= 4.1.6)
-      activesupport (= 4.1.6)
+      railties (= 4.2.11.3)
+      sprockets-rails
+    rails-deprecated_sanitizer (1.0.4)
+      activesupport (>= 4.2.0.alpha)
+    rails-dom-testing (1.0.9)
+      activesupport (>= 4.2.0, < 5.0)
+      nokogiri (~> 1.6)
+      rails-deprecated_sanitizer (>= 1.0.1)
+    rails-html-sanitizer (1.4.3)
+      loofah (~> 2.3)
+    railties (4.2.11.3)
+      actionpack (= 4.2.11.3)
+      activesupport (= 4.2.11.3)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
-    rake (10.4.2)
-    rb-fsevent (0.9.4)
-    rb-inotify (0.9.5)
-      ffi (>= 0.5.0)
-    responders (1.1.2)
-      railties (>= 3.2, < 4.2)
+    rake (10.0.4)
+    responders (2.4.1)
+      actionpack (>= 4.2.0, < 6.0)
+      railties (>= 4.2.0, < 6.0)
     ruby-progressbar (1.5.1)
+    ruby2_keywords (0.0.5)
     simplecov (0.9.0)
       docile (~> 1.1.0)
       multi_json
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
-    slop (3.6.0)
-    sprockets (3.5.2)
+    sprockets (3.7.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
-    sprockets-rails (2.3.3)
-      actionpack (>= 3.0)
-      activesupport (>= 3.0)
-      sprockets (>= 2.8, < 4.0)
+    sprockets-rails (3.2.2)
+      actionpack (>= 4.0)
+      activesupport (>= 4.0)
+      sprockets (>= 3.0.0)
     sqlite3 (1.3.9)
-    thor (0.19.1)
-    thread_safe (0.3.5)
-    timers (1.1.0)
-    tzinfo (1.2.2)
+    thor (1.2.1)
+    thread_safe (0.3.6)
+    tzinfo (1.2.10)
       thread_safe (~> 0.1)
-    warden (1.2.4)
+    warden (1.2.7)
       rack (>= 1.0)
 
 PLATFORMS
@@ -209,26 +210,26 @@ PLATFORMS
 
 DEPENDENCIES
   attr_encrypted
+  bigdecimal (~> 1.3.5)
   byebug
   codeclimate-test-reporter
   faker
   figaro!
   fuzz_ball
-  guard
-  guard-minitest
   minitest
   minitest-focus
   minitest-rails
   minitest-reporters
-  mysql2
+  omniauth (~> 1.0)
   omniauth-facebook!
   omniauth-github!
   omniauth-google-oauth2!
   pg
   rack-cors
+  rake (~> 10.0.0)
   sqlite3 (~> 1.3)
   thor
   xing_backend_token_auth!
 
 BUNDLED WITH
-   1.11.2
+   1.17.3

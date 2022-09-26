@@ -8,7 +8,7 @@ module Overrides
         client_id  = SecureRandom.urlsafe_base64(nil, false)
         token      = SecureRandom.urlsafe_base64(nil, false)
         token_hash = BCrypt::Password.create(token)
-        expiry     = (Time.now + DeviseTokenAuth.token_lifespan).to_i
+        expiry     = (Time.zone.now + DeviseTokenAuth.token_lifespan).to_i
 
         @user.tokens[client_id] = {
           token:  token_hash,

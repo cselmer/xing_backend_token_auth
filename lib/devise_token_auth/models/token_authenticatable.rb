@@ -4,7 +4,6 @@ module Devise
       extend ActiveSupport::Concern
 
       included do
-
         serialize :tokens, JSON
         # can't set default on text fields in mysql, simulate here instead.
         after_save :set_empty_token_hash
@@ -12,48 +11,39 @@ module Devise
         before_save :destroy_expired_tokens
 
         # override devise method to include additional info as opts hash
-        def send_confirmation_instructions(opts=nil)
-          unless @raw_confirmation_token
-            generate_confirmation_token!
-          end
+        def send_confirmation_instructions(opts = nil)
+          generate_confirmation_token! unless @raw_confirmation_token
 
           opts ||= {}
 
           # fall back to "default" config name
-          opts[:client_config] ||= "default"
+          opts[:client_config] ||= 'default'
 
-          if pending_reconfirmation?
-            opts[:to] = unconfirmed_email
-          end
+          opts[:to] = unconfirmed_email if pending_reconfirmation?
 
           send_devise_notification(:confirmation_instructions, @raw_confirmation_token, opts)
         end
 
-
         # override devise method to include additional info as opts hash
-        def send_reset_password_instructions(opts=nil)
+        def send_reset_password_instructions(opts = nil)
           token = set_reset_password_token
 
           opts ||= {}
 
           # fall back to "default" config name
-          opts[:client_config] ||= "default"
+          opts[:client_config] ||= 'default'
 
-          if pending_reconfirmation?
-            opts[:to] = unconfirmed_email
-          else
-            opts[:to] = email
-          end
+          opts[:to] = if pending_reconfirmation?
+                        unconfirmed_email
+                      else
+                        email
+                      end
 
           send_devise_notification(:reset_password_instructions, token, opts)
 
           token
         end
-
       end
-
-
-
 
       # this must be done from the controller so that additional params
       # can be passed on from the client
@@ -61,110 +51,93 @@ module Devise
         false
       end
 
-      def valid_token?(token, client_id='default')
+      def valid_token?(token, client_id = 'default')
         client_id ||= 'default'
 
-        return false unless self.tokens[client_id]
+        return false unless tokens[client_id]
 
-        return true if token_is_current?(token, client_id)
-        return true if token_can_be_reused?(token, client_id)
-
-        # return false if none of the above conditions are met
-        return false
+        token_is_current?(token, client_id) &&
+          token_can_be_reused?(token, client_id)
       end
-
 
       def token_is_current?(token, client_id)
-        return true if (
-          # ensure that expiry and token are set
-          self.tokens[client_id]['expiry'] and
-          self.tokens[client_id]['token'] and
+        # ensure that expiry and token are set
+        tokens[client_id][:expiry] &&
+          tokens[client_id][:token] &&
 
           # ensure that the token was created within the last two weeks
-          DateTime.strptime(self.tokens[client_id]['expiry'].to_s, '%s') > Time.now and
+          DateTime.strptime(tokens[client_id][:expiry].to_s, '%s') > Time.zone.now &&
 
           # ensure that the token is valid
-          BCrypt::Password.new(self.tokens[client_id]['token']) == token
-        )
+          BCrypt::Password.new(tokens[client_id][:token]) == token
       end
-
 
       # allow batch requests to use the previous token
       def token_can_be_reused?(token, client_id)
-        return true if (
-          # ensure that the last token and its creation time exist
-          self.tokens[client_id]['updated_at'] and
-          self.tokens[client_id]['last_token'] and
+        # ensure that the last token and its creation time exist
+        tokens[client_id][:updated_at] &&
+          tokens[client_id][:last_token] &&
 
           # ensure that previous token falls within the batch buffer throttle time of the last request
-          Time.parse(self.tokens[client_id]['updated_at']) > Time.now - DeviseTokenAuth.batch_request_buffer_throttle and
+          Time.parse(tokens[client_id][:updated_at]) > Time.zone.now - DeviseTokenAuth.batch_request_buffer_throttle &&
 
           # ensure that the token is valid
-          BCrypt::Password.new(self.tokens[client_id]['last_token']) == token
-        )
+          BCrypt::Password.new(tokens[client_id][:last_token]) == token
       end
-
 
       # update user's auth token (should happen on each request)
-      def create_new_auth_token(client_id=nil)
-        client_id  ||= SecureRandom.urlsafe_base64(nil, false)
-        last_token ||= nil
+      def create_new_auth_token(client_id = nil)
+        client_id ||= SecureRandom.urlsafe_base64(nil, false)
+        last_token = nil
         token        = SecureRandom.urlsafe_base64(nil, false)
         token_hash   = BCrypt::Password.create(token)
-        expiry       = (Time.now + DeviseTokenAuth.token_lifespan).to_i
+        expiry       = (Time.zone.now + DeviseTokenAuth.token_lifespan).to_i
 
-        if self.tokens[client_id] and self.tokens[client_id]['token']
-          last_token = self.tokens[client_id]['token']
-        end
+        last_token = tokens[client_id][:token] if tokens[client_id] && tokens[client_id][:token]
 
-        self.tokens[client_id] = {
-          token:      token_hash,
-          expiry:     expiry,
+        tokens[client_id] = {
+          token: token_hash,
+          expiry: expiry,
           last_token: last_token,
-          updated_at: Time.now
-       }
+          updated_at: Time.zone.now
+        }
 
-        self.save!
+        save!
 
-        return build_auth_header(token, client_id)
+        build_auth_header(token, client_id)
       end
 
-
-      def build_auth_header(token, client_id='default')
+      def build_auth_header(token, client_id = 'default')
         client_id ||= 'default'
 
         # client may use expiry to prevent validation request if expired
         # must be cast as string or headers will break
-        expiry = self.tokens[client_id]['expiry'].to_s
+        expiry = tokens[client_id][:expiry].to_s
 
-        return {
-          "access-token" => token,
-          "token-type"   => "Bearer",
-          "client"       => client_id,
-          "expiry"       => expiry,
-          "uid"          => self.uid
+        {
+          'access-token' => token,
+          'token-type' => 'Bearer',
+          'client' => client_id,
+          'expiry' => expiry,
+          'uid' => uid
         }
       end
 
-
       def build_auth_url(base_url, args)
-        args[:uid]    = self.uid
-        args[:expiry] = self.tokens[args[:client_id]]['expiry']
+        args[:uid]    = uid
+        args[:expiry] = tokens[args[:client_id]][:expiry]
 
         generate_url(base_url, args)
       end
 
-
       def extend_batch_buffer(token, client_id)
-        self.tokens[client_id]['updated_at'] = Time.now
-        self.save!
+        tokens[client_id][:updated_at] = Time.zone.now
+        save!
 
-        return build_auth_header(token, client_id)
+        build_auth_header(token, client_id)
       end
 
-
       protected
-
 
       # ensure that fragment comes AFTER querystring for proper $location
       # parsing using AngularJS.
@@ -172,12 +145,12 @@ module Devise
         uri = URI(url)
 
         res = "#{uri.scheme}://#{uri.host}"
-        res += ":#{uri.port}" if (uri.port and uri.port != 80 and uri.port != 443)
+        res += ":#{uri.port}" if uri.port and uri.port != 80 and uri.port != 443
         res += "#{uri.path}#" if uri.path
-        res += "#{uri.fragment}" if uri.fragment
+        res += uri.fragment.to_s if uri.fragment
         res += "?#{params.to_query}"
 
-        return res
+        res
       end
 
       def set_empty_token_hash
@@ -185,10 +158,13 @@ module Devise
       end
 
       def destroy_expired_tokens
-        self.tokens.delete_if{|cid,v|
-          expiry = v[:expiry] || v["expiry"]
-          DateTime.strptime(expiry.to_s, '%s') < Time.now
-        }
+        self.tokens.delete_if do |_cid, v|
+          expiry = v[:expiry].presence || v['expiry']
+          next(false) unless expiry
+
+          Time.at(expiry) < Time.zone.now
+        end
+        true
       end
     end
   end

@@ -28,7 +28,7 @@ module DeviseTokenAuth
       # create token info
       @client_id = SecureRandom.urlsafe_base64(nil, false)
       @token     = SecureRandom.urlsafe_base64(nil, false)
-      @expiry    = (Time.now + DeviseTokenAuth.token_lifespan).to_i
+      @expiry    = (Time.zone.now + DeviseTokenAuth.token_lifespan).to_i
 
       @auth_origin_url = generate_url(omniauth_params['auth_origin_url'], {
         token:     @token,
