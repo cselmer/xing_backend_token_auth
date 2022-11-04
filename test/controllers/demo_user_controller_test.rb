@@ -168,6 +168,8 @@ class DemoUserControllerTest < ActionDispatch::IntegrationTest
 
             get '/demo/members_only', {}, @auth_headers
 
+            byebug
+
             @first_is_batch_request = assigns(:is_batch_request)
             @first_user = assigns(:user)
             @first_access_token = response.headers['access-token']

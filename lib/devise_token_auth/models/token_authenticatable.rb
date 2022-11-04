@@ -52,6 +52,7 @@ module Devise
       end
 
       def valid_token?(token, client_id = 'default')
+        # byebug
         client_id ||= 'default'
 
         return false unless tokens[client_id]
@@ -62,27 +63,27 @@ module Devise
 
       def token_is_current?(token, client_id)
         # ensure that expiry and token are set
-        tokens[client_id][:expiry] &&
-          tokens[client_id][:token] &&
+        tokens[client_id]['expiry'] &&
+          tokens[client_id]['token'] &&
 
           # ensure that the token was created within the last two weeks
-          DateTime.strptime(tokens[client_id][:expiry].to_s, '%s') > Time.zone.now &&
+          DateTime.strptime(tokens[client_id]['expiry'].to_s, '%s') > Time.zone.now &&
 
           # ensure that the token is valid
-          BCrypt::Password.new(tokens[client_id][:token]) == token
+          BCrypt::Password.new(tokens[client_id]['token']) == token
       end
 
       # allow batch requests to use the previous token
       def token_can_be_reused?(token, client_id)
         # ensure that the last token and its creation time exist
-        tokens[client_id][:updated_at] &&
-          tokens[client_id][:last_token] &&
+        tokens[client_id]['updated_at'].present? &&
+          tokens[client_id]['last_token'].present? &&
 
           # ensure that previous token falls within the batch buffer throttle time of the last request
-          Time.parse(tokens[client_id][:updated_at]) > Time.zone.now - DeviseTokenAuth.batch_request_buffer_throttle &&
+          Time.parse(tokens[client_id]['updated_at']) > Time.zone.now - DeviseTokenAuth.batch_request_buffer_throttle &&
 
           # ensure that the token is valid
-          BCrypt::Password.new(tokens[client_id][:last_token]) == token
+          BCrypt::Password.new(tokens[client_id]['last_token']) == token
       end
 
       # update user's auth token (should happen on each request)
@@ -93,13 +94,13 @@ module Devise
         token_hash   = BCrypt::Password.create(token)
         expiry       = (Time.zone.now + DeviseTokenAuth.token_lifespan).to_i
 
-        last_token = tokens[client_id][:token] if tokens[client_id] && tokens[client_id][:token]
+        last_token = tokens[client_id]['token'] if tokens[client_id] && tokens[client_id]['token']
 
         tokens[client_id] = {
-          token: token_hash,
-          expiry: expiry,
-          last_token: last_token,
-          updated_at: Time.zone.now
+          'token' => token_hash,
+          'expiry' =>  expiry,
+          'last_token' => last_token,
+          'updated_at' => Time.zone.now
         }
 
         save!
@@ -112,7 +113,7 @@ module Devise
 
         # client may use expiry to prevent validation request if expired
         # must be cast as string or headers will break
-        expiry = tokens[client_id][:expiry].to_s
+        expiry = tokens[client_id]['expiry'].to_s
 
         {
           'access-token' => token,
@@ -125,13 +126,13 @@ module Devise
 
       def build_auth_url(base_url, args)
         args[:uid]    = uid
-        args[:expiry] = tokens[args[:client_id]][:expiry]
+        args[:expiry] = tokens[args[:client_id]]['expiry']
 
         generate_url(base_url, args)
       end
 
       def extend_batch_buffer(token, client_id)
-        tokens[client_id][:updated_at] = Time.zone.now
+        tokens[client_id]['updated_at'] = Time.zone.now
         save!
 
         build_auth_header(token, client_id)
@@ -159,11 +160,12 @@ module Devise
 
       def destroy_expired_tokens
         self.tokens.delete_if do |_cid, v|
-          expiry = v[:expiry].presence || v['expiry']
+          expiry = v['expiry'].presence || v['expiry']
           next(false) unless expiry
 
           Time.at(expiry) < Time.zone.now
         end
+        # byebug
         true
       end
     end

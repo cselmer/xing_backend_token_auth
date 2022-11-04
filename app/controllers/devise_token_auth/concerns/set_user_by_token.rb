@@ -36,14 +36,17 @@ module DeviseTokenAuth::Concerns::SetUserByToken
     @client_id ||= 'default'
 
     # mitigate timing attacks by finding by uid instead of auth token
+    # byebug
     user = uid && rc.find_by_uid(uid)
 
     if user && user.valid_token?(@token, @client_id)
       sign_in(resource_name, user, store: false)
-      return @user = user
+      @user = user
+      return
     else
       # zero all values previously set values
-      return @user = nil
+      @user = nil
+      return
     end
   end
 
@@ -53,11 +56,11 @@ module DeviseTokenAuth::Concerns::SetUserByToken
     # cannot save object if model has invalid params
     return unless @user and @user.valid? and @client_id
 
-    # Lock the user record during any auth_header updates to ensure 
+    # Lock the user record during any auth_header updates to ensure
     # we don't have write contention from multiple threads
     @user.with_lock do
-      
-      # determine batch request status after request processing, in case 
+
+      # determine batch request status after request processing, in case
       # another processes has updated it during that processing
       @is_batch_request = is_batch_request?(@user, @client_id)
 

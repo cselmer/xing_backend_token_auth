@@ -192,7 +192,7 @@ Devise.setup do |config|
   config.sign_out_via = :delete
 
   # don't serialize tokens
-  Devise::Models::Authenticatable::BLACKLIST_FOR_SERIALIZATION << :tokens
+  # Devise::Models::Authenticatable::UNSAFE_ATTRIBUTES_FOR_SERIALIZATION << :tokens
 
   # mounted routes will point to this
   Rails.application.config.after_initialize do

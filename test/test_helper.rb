@@ -41,19 +41,19 @@ class ActiveSupport::TestCase
   # Add more helper methods to be used by all tests here...
 
   def age_token(user, client_id)
-    user.tokens[client_id][:updated_at] = Time.zone.now - (DeviseTokenAuth.batch_request_buffer_throttle + 10.seconds)
+    user.tokens[client_id]['updated_at'] = Time.zone.now - (DeviseTokenAuth.batch_request_buffer_throttle + 10.seconds)
     user.save!
   end
 
   def expire_token(user, client_id)
     byebug
-    user.tokens[client_id][:expiry] = (Time.zone.now - (DeviseTokenAuth.token_lifespan.to_f + 10.seconds)).to_i
+    user.tokens[client_id]['expiry'] = (Time.zone.now - (DeviseTokenAuth.token_lifespan.to_f + 10.seconds)).to_i
     user.save!
   end
 end
 
 class ActionController::TestCase
-  include Devise::TestHelpers
+  include Devise::Test::ControllerHelpers
 
   setup do
     @routes = Dummy::Application.routes

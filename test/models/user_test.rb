@@ -53,14 +53,14 @@ class UserTest < ActiveSupport::TestCase
       test 'should properly indicate whether token is current' do
         assert @user.token_is_current?(@token, @client_id)
         # we want to update the expiry without forcing a cleanup (see below)
-        @user.tokens[@client_id][:expiry] = Time.zone.now.to_i - 10.seconds
+        @user.tokens[@client_id]['expiry'] = Time.zone.now.to_i - 10.seconds
         refute @user.token_is_current?(@token, @client_id)
       end
     end
 
     describe 'expired tokens are destroyed on save' do
       before do
-        byebug
+        # byebug
         @user = users(:confirmed_email_user)
         @user.skip_confirmation!
         @user.save!

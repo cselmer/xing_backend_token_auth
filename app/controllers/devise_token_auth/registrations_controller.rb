@@ -37,8 +37,8 @@ module DeviseTokenAuth
             @token     = SecureRandom.urlsafe_base64(nil, false)
 
             @user.tokens[@client_id] = {
-              token: BCrypt::Password.create(@token),
-              expiry: (Time.zone.now + DeviseTokenAuth.token_lifespan).to_i
+              'token' => BCrypt::Password.create(@token),
+              'expiry' =>(Time.zone.now + DeviseTokenAuth.token_lifespan).to_i
             }
 
             @user.save!

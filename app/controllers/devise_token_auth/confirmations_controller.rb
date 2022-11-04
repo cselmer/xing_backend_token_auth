@@ -11,8 +11,8 @@ module DeviseTokenAuth
         expiry     = (Time.zone.now + DeviseTokenAuth.token_lifespan).to_i
 
         @user.tokens[client_id] = {
-          token:  token_hash,
-          expiry: expiry
+          'token' =>  token_hash,
+          'expiry' => expiry
         }
 
         @user.save!
