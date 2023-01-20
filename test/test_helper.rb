@@ -46,7 +46,7 @@ class ActiveSupport::TestCase
   end
 
   def expire_token(user, client_id)
-    byebug
+    # byebug
     user.tokens[client_id][:expiry] = (Time.zone.now - (DeviseTokenAuth.token_lifespan.to_f + 10.seconds)).to_i
     user.save!
   end

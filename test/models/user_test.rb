@@ -60,7 +60,7 @@ class UserTest < ActiveSupport::TestCase
 
     describe 'expired tokens are destroyed on save' do
       before do
-        byebug
+        # byebug
         @user = users(:confirmed_email_user)
         @user.skip_confirmation!
         @user.save!

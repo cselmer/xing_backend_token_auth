@@ -8,9 +8,7 @@ class ApplicationController < ActionController::Base
   protected
 
   def configure_permitted_parameters
-    devise_parameter_sanitizer.for(:sign_up) << :operating_thetan
-    devise_parameter_sanitizer.for(:sign_up) << :favorite_color
-    devise_parameter_sanitizer.for(:account_update) << :operating_thetan
-    devise_parameter_sanitizer.for(:account_update) << :favorite_color
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:operating_thetan, :favorite_color])
+    devise_parameter_sanitizer.permit(:account_update, keys: [:operating_thetan, :favorite_color])
   end
 end

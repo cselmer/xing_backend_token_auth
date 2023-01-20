@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir['test/**/*']
 
   s.add_dependency 'bigdecimal', '~> 1.3.5'
-  s.add_dependency 'devise', '~> 3.2'
+  s.add_dependency 'devise', '4.4.3'
   s.add_dependency 'rails', '~> 4.1'
   s.add_dependency 'sprockets', '< 4'
 

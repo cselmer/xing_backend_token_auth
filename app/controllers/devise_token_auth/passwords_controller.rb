@@ -100,7 +100,7 @@ module DeviseTokenAuth
     end
 
     def password_resource_params
-      devise_parameter_sanitizer.sanitize(:account_update)
+      devise_parameter_sanitizer.permit(:account_update)
     end
 
     def resource_serializer(user)
