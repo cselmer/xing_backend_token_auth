@@ -84,11 +84,11 @@ module DeviseTokenAuth
     end
 
     def sign_up_params
-      devise_parameter_sanitizer.permit(:sign_up)
+      devise_parameter_sanitizer.sanitize(:sign_up)
     end
 
     def account_update_params
-      devise_parameter_sanitizer.permit(:account_update)
+      devise_parameter_sanitizer.sanitize(:account_update)
     end
 
     def resource_serializer(user)
