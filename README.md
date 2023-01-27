@@ -399,7 +399,7 @@ Models that include the `DeviseTokenAuth::Concerns::User` concern will have acce
   ~~~ruby
   # extract token + client_id from auth header
   client_id = request.headers['client']
-  token = request.headers['access_token']
+  token = request.headers['access-token']
 
   @user.valid_token?(token, client_id)
   ~~~
