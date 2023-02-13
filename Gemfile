@@ -13,6 +13,7 @@ gemspec
 # To use debugger
 # gem 'debugger'
 
+gem 'bcrypt'
 gem 'bigdecimal', '~> 1.3.5'
 gem 'rake', '~> 10.0.0'
 

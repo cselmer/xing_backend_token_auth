@@ -223,6 +223,7 @@ PLATFORMS
 
 DEPENDENCIES
   attr_encrypted
+  bcrypt
   bigdecimal (~> 1.3.5)
   byebug
   codeclimate-test-reporter
