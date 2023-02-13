@@ -1,7 +1,10 @@
+require 'bcrypt'
+
 module Devise
   module Models
     module TokenAuthenticatable
       extend ActiveSupport::Concern
+      include BCrypt
 
       included do
         serialize :tokens, JSON
