@@ -1,3 +1,5 @@
+require 'bcrypt'
+
 module Devise
   module Models
     module TokenAuthenticatable
